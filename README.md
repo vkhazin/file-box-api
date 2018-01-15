@@ -11,3 +11,7 @@
 7. Logging at error/warning/info levels to be redirected to AWS CloudWatch for both deployment models
 8. Configuration must use lambda environment variables for lambda deployment and ec2 launch script for ec2 deployment to populate environment variables
 9. Documentation with sample request/response will use a Markdown format andor a RAML
+
+## [API Design](./docs/API.md)
+
+## [Authentication and Authrozation](./docs/AuthC&AuthZ.md)
