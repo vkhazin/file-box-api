@@ -1,0 +1,33 @@
+{
+  "name": "file-box-api",
+  "version": "1.0.0",
+  "description": "End-point using AWS Gateway + Lambda to upload/download files",
+  "main": "lambda.js",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha --reporter spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jaredjensen/file-box-api.git"
+  },
+  "keywords": [
+    "nodejs",
+    "aws"
+  ],
+  "author": "Jared Jensen <jaredjensen@smith.co>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jaredjensen/file-box-api/issues"
+  },
+  "homepage": "https://github.com/jaredjensen/file-box-api#readme",
+  "dependencies": {
+    "aws-lambda-http-router": "^1.0.5",
+    "aws-sdk": "^2.88.0",
+    "bluebird": "^3.5.0",
+    "config": "^1.26.1"
+  },
+  "devDependencies": {
+    "chai": "^4.1.0",
+    "mocha": "^3.4.2"
+  }
+}
