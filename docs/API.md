@@ -10,35 +10,35 @@
 
 * POST /folder-name/sub-folder-name/file-name
 * Https Headers:
-```text
-content-type: image/jpeg
-x-api-key: a-long-string-may-be-a-uuid for authC and authZ purposes
-x-metadata-key1: value1
-x-metadata-key2: value2
-x-ttl-sec: number of seconds to keep the file, default: 0 - keep forever
-x-versions-to-keep: max number of versions to keep, default value is stored in the service configuration 
-```
+  ```text
+  content-type: image/jpeg
+  x-api-key: a-long-string-may-be-a-uuid for authC and authZ purposes
+  x-metadata-key1: value1
+  x-metadata-key2: value2
+  x-ttl-sec: number of seconds to keep the file, default: 0 - keep forever
+  x-versions-to-keep: max number of versions to keep, default value is stored in the service configuration 
+  ```
 * Body: raw file content
 
 ### Response - Success
 * Status: 201 - for new file | 200 - for existing file
 * Body:
-```json
-{
-  "metadata": [
-    {
-      "key1": "value1"
-    },
-    {
-      "key2": "value2"
-    }
-  ],
-  "link": "/folder-name/sub-folder-name/file-name",
-  "versions": [0, 1, 2, 3],
-  "ttl" : 0,
-  "timestamp": "2018-01-31T02:34:00.345Z"
-}
-```
+  ```json
+  {
+    "metadata": [
+      {
+        "key1": "value1"
+      },
+      {
+        "key2": "value2"
+      }
+    ],
+    "link": "/folder-name/sub-folder-name/file-name",
+    "versions": [0, 1, 2, 3],
+    "ttl" : 0,
+    "timestamp": "2018-01-31T02:34:00.345Z"
+  }
+  ```
   
 ## Get File
 
