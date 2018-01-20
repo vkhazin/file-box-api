@@ -2,6 +2,9 @@
 
 * Reference: https://philsturgeon.uk/api/2016/01/04/http-rest-api-file-uploads/
 
+## Reserved keywords
+* Path cannot start with a `$` sign - reserved for special end-points, e.g. `/$search`
+
 ## Post File
 
 * Post uploads a new file or a new version for a file
