@@ -10,7 +10,7 @@
 
 * POST /folder-name/sub-folder-name/file-name
 * Https Headers:
-```
+```text
 content-type: image/jpeg
 x-api-key: a-long-string-may-be-a-uuid for authC and authZ purposes
 x-metadata-key1: value1
@@ -23,7 +23,7 @@ x-versions-to-keep: max number of versions to keep, default value is stored in t
 ### Response - Success
 * Status: 201 - for new file | 200 - for existing file
 * Body:
-```
+```json
 {
   "metadata": [
     {
@@ -45,7 +45,7 @@ x-versions-to-keep: max number of versions to keep, default value is stored in t
 ### Request
 * GET /folder-name/sub-folder-name/file-name
 * Https Headers:
-```
+```text
 x-api-key: a-long-string-may-be-a-uuid
 x-version: version number to retrieve, default is null - get latest version available
 ```
@@ -53,7 +53,7 @@ x-version: version number to retrieve, default is null - get latest version avai
 ### Response - Success
 * Status: 200
 * Headers:
-```
+```json
 content-type: image/jpeg
 x-metadata-key1: value1
 x-metadata-key2: value2
@@ -68,7 +68,7 @@ x-timestamp: "2018-01-31T02:34:00.345Z
 ### Request
 * GET /$search?q=/path/to/folder&from=0&size=10
 * Https Headers:
-```
+```text
 x-api-key: a-long-string-may-be-a-uuid
 ```
 * Configuration settings, default size and max size, in case max size is exceeded: 404 with error details
@@ -76,7 +76,7 @@ x-api-key: a-long-string-may-be-a-uuid
 ### Response - Success
 * Status: 200
 * Body:
-```
+```json
 [
   {
     "metadata": [
@@ -103,7 +103,7 @@ x-api-key: a-long-string-may-be-a-uuid
         403 - x-api-key not authorized for the action | 
         400 - invalid request in case `q` points to a file instead of a path prefix
 * Body:
-```
+```json
 {
   "message": "error messsage details"
 }
@@ -114,7 +114,7 @@ x-api-key: a-long-string-may-be-a-uuid
 ### Request
 * DELETE /folder-name/sub-folder-name/file-name
 * Https Headers:
-```
+```text
 content-type: applicaiton/json
 x-api-key: a-long-string-may-be-a-uuid
 x-version: version number to delete, default is `null` to delete all versions
@@ -127,7 +127,7 @@ x-version: version number to delete, default is `null` to delete all versions
 ## Request Failures
 * Status: 500 - for uknown error | 401 - invalid/missing x-api-key | 403 - x-api-key not authorized for the action
 * Body:
-```
+```json
 {
   "message": "error messsage details"
 }
