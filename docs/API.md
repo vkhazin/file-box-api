@@ -53,7 +53,7 @@ x-version: version number to retrieve, default is null - get latest version avai
 ### Response - Success
 * Status: 200
 * Headers:
-```json
+```text
 content-type: image/jpeg
 x-metadata-key1: value1
 x-metadata-key2: value2
