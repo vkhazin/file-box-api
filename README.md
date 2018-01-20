@@ -19,3 +19,5 @@
 ## [API Design](./docs/API.md)
 
 ## [Authentication and Authrozation](./docs/AuthC&AuthZ.md)
+
+## [Storage Desing](./docs/StorageDesign.md)
