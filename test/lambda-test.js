@@ -1,16 +1,13 @@
 process.env.config = JSON.stringify(require('../config/local-testing.json'));
-const lambda = require('../lambda');
 const assert = require('assert');
+const lambda = require('../lambda');
+const constants = require('../constants');
 
 const helloWorldBase64 = 'SGVsbG8gV29ybGQh';
 
 const context = {
-  succeed: (data) => {
-    console.log(data);
-  },
-  fail: (err) => {
-    console.error(err);
-  }
+  succeed: data => console.log(data),
+  fail: err => console.error(err)
 };
 
 const callback = (err, result) => {
@@ -22,44 +19,44 @@ const callback = (err, result) => {
   console.error('err:', err);
 };
 
-describe('lambda', function () {
+describe('lambda', () => {
 
-  describe('file', function () {
+  describe('file', () => {
 
-    it('Should return metadata when file is stored', function (done) {
-      const data = {
-        metadata: [
-          {
-            key: 'value1'
-          }, {
-            key: 'value2'
-          }
-        ],
-        content: helloWorldBase64
-      };
+    it('Should return metadata when file is stored', (done) => {
+      const metadata = [
+        {
+          key: 'value1'
+        }, {
+          key: 'value2'
+        }
+      ];
+
       const event = {
         httpMethod: 'POST',
         path: '/test/hello-world',
-        body: JSON.stringify(data)
+        headers: {
+          [constants.METADATA_HEADER_NAME]: JSON.stringify(metadata)
+        },
+        body: helloWorldBase64
       };
 
       lambda
         .handler(event, context, callback)
-        .then(function (response) {
+        .then((response) => {
           assert.equal(response.statusCode, 200, 'Status code should be equal 200');
-          assert.equal(typeof(response.body), 'string', 'Body must be a string');
           const result = JSON.parse(response.body);
-          assert.equal(result.metadata.length, data.metadata.length, 'Metadata have same number of keys');
-          assert.equal(result.metadata[0].key, data.metadata[0].key, 'Metadata 0 must be correct');
-          assert.equal(result.metadata[1].key, data.metadata[1].key, 'Metadata 1 must be correct');
+          assert.equal(result.metadata.length, metadata.length, 'Metadata have same number of keys');
+          assert.equal(result.metadata[0].key, metadata[0].key, 'Metadata 0 must be correct');
+          assert.equal(result.metadata[1].key, metadata[1].key, 'Metadata 1 must be correct');
         })
         .done(done);
     });
 
-    it('Should return a list of files', function (done) {
+    it('Should return a list of files', (done) => {
       const event = {
         httpMethod: 'GET',
-        path: '/test',
+        path: '/$search/test/',
         queryStringParameters: {
           from: 0,
           size: 10
@@ -68,16 +65,15 @@ describe('lambda', function () {
 
       lambda
         .handler(event, context, callback)
-        .then(function (response) {
+        .then((response) => {
           assert.equal(response.statusCode, 200, 'Status code should be equal 200');
-          assert.equal(typeof(response.body), 'string', 'Body must be a string');
           const result = JSON.parse(response.body);
-          assert(result.length > 0, 'Should not return empty array');
+          assert(result.length > 0, 'Should return at least one file');
         })
         .done(done);
     });
 
-    it('Should return file info when fetched', function (done) {
+    it('Should return file when fetched', (done) => {
       const event = {
         httpMethod: 'GET',
         path: '/test/hello-world'
@@ -85,17 +81,14 @@ describe('lambda', function () {
 
       lambda
         .handler(event, context, callback)
-        .then(function (response) {
+        .then((response) => {
           assert.equal(response.statusCode, 200, 'Status code should be equal 200');
-          assert.equal(typeof(response.body), 'string', 'Body must be a string');
-          const result = JSON.parse(response.body);
-          assert.equal(result.content, helloWorldBase64, 'Content must be correct');
-          assert.equal(result.metadata.length, 2, 'Metadata must have 2 properties');
+          assert.equal(response.body, helloWorldBase64, 'Content must be correct');
         })
         .done(done);
     });
 
-    it('Should return 200 when file is deleted', function (done) {
+    it('Should return 204 when file is deleted', (done) => {
       const event = {
         httpMethod: 'DELETE',
         path: '/test/hello-world'
@@ -103,14 +96,14 @@ describe('lambda', function () {
 
       lambda
         .handler(event, context, callback)
-        .then(function (response) {
-          assert.equal(response.statusCode, 200, 'Status code should be equal 200');
+        .then((response) => {
+          assert.equal(response.statusCode, 204, 'Status code should be equal 200');
           assert(response.body == null, 'Body must be null');
         })
         .done(done);
     });
 
-    it('Should not return 200 for missing file', function (done) {
+    it('Should return 404 for missing file', (done) => {
       const event = {
         httpMethod: 'GET',
         path: '/test/hello-world'
@@ -118,8 +111,8 @@ describe('lambda', function () {
 
       lambda
         .handler(event, context, callback)
-        .then(function (response) {
-          assert.notEqual(response.statusCode, 200, 'Status code should not equal 200');
+        .then((response) => {
+          assert.equal(response.statusCode, 404, 'Status code should equal 404');
         })
         .done(done);
     });

@@ -2,46 +2,56 @@
 const promise = require('bluebird');
 const utils = require('./utils');
 
-const repo = {};
+const repo = {
+  '/sample/file1.txt': {
+    metadata: {
+      name: 'file1',
+      type: 'text'
+    },
+    content: 'SGVsbG8gV29ybGQh'
+  },
+  '/sample/file2.png': {
+    metadata: {
+      name: 'file2',
+      type: 'image'
+    },
+    content: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+P+/HgAFhAJ/wlseKgAAAABJRU5ErkJggg=='
+  }
+};
 
 exports.create = function (config, logger) {
 
   return (function () {
     return {
 
-      store: function (path, data) {
+      store: function (path, base64Content, metadata) {
         const file = {
-          content: data.content,
-          metadata: data.metadata,
-          path: path
+          content: base64Content,
+          metadata: metadata
         };
         repo[path] = file;
-        return promise.resolve({metadata: data.metadata, path: path});
+        return promise.resolve({metadata: metadata, path: path});
       },
 
       fetch: function (path) {
-        if (repo[path]) {
-          return promise.resolve(repo[path]);
-        }
-        return promise.reject(`No file found at "${path}"`);
+        return promise.resolve(repo[path] || null);
       },
 
       list: function (path, from, size) {
-        if (path[path.length - 1] === '/') {
-          path = path.substring(0, path.length - 1);
-        }
         let to = from + size;
-        let skip = 0;
         let files = [];
-        const filesInFolder = Object
+        const matchingFiles = Object
           .keys(repo)
-          .filter(x => utils.splitPath(x).folder == path);
-        const thisSetPaths = filesInFolder.slice(from, from + size);
-        const thisSetFiles = [];
-        for (var i = 0; i < thisSetPaths.length; i++) {
-          thisSetFiles.push(repo[thisSetPaths[i]]);
+          .filter(x => x.startsWith(path));
+        const paths = matchingFiles.slice(from, from + size);
+        const result = [];
+        for (var i = 0; i < paths.length; i++) {
+          result.push({
+            path: paths[i],
+            metadata: repo[paths[i]].metadata
+          });
         }
-        return promise.resolve(thisSetFiles);
+        return promise.resolve(result);
       },
 
       delete: function (path) {

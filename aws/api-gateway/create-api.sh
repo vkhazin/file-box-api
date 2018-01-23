@@ -1,4 +1,4 @@
-AWS_REGION='us-east-2'
+AWS_REGION='us-west-2'
 BASEDIR=$(dirname $0)
 
 # Create api-gateway

@@ -1,7 +1,14 @@
+function removeCommandSegment(path) {
+  const newPath = path.replace(/^\/\$[^/]+/, '');
+  return newPath;
+}
+
 function splitPath(path) {
-  const result = { folder: '', file: '' };
-  if (path)
-  {
+  const result = {
+    folder: '',
+    file: ''
+  };
+  if (path) {
     const idx = path.lastIndexOf('/');
     if (idx == -1) {
       result.file = path;
@@ -14,5 +21,6 @@ function splitPath(path) {
 }
 
 module.exports = {
+  removeCommandSegment: removeCommandSegment,
   splitPath: splitPath
 };
