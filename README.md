@@ -20,4 +20,4 @@
 
 ## [Authentication and Authrozation](./docs/AuthC&AuthZ.md)
 
-## [Storage Desing](./docs/StorageDesign.md)
+## [Storage Design](./docs/StorageDesign.md)
