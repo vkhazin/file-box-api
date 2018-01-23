@@ -10,8 +10,14 @@
 6. Unit tests and integration test will be required
 7. Logging at error/warning/info levels to be redirected to AWS CloudWatch for both deployment models
 8. Configuration must use lambda environment variables for lambda deployment and ec2 launch script for ec2 deployment to populate environment variables
-9. Documentation with sample request/response will use a Markdown format andor a RAML
+9. Documentation with sample request/response will use a Markdown format and/or a RAML/Swagger
+
+## Use Cases to cover
+1. Store mulitple versions of the same document with an option to limit old version to N
+2. Support ttl for automatic files expiry and purging
 
 ## [API Design](./docs/API.md)
 
 ## [Authentication and Authrozation](./docs/AuthC&AuthZ.md)
+
+## [Storage Desing](./docs/StorageDesign.md)
