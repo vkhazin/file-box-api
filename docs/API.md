@@ -5,6 +5,14 @@
 ## Reserved keywords
 * Path cannot start with a `$` sign - reserved for special end-points, e.g. `/$search`
 
+## Swagger Documentation
+
+### Request
+* GET /$doc
+
+### Response - Success
+* Swagger UI/Api - not sure what is the common practice
+
 ## Post File
 
 * Post uploads a new file or a new version for a file
