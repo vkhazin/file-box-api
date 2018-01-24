@@ -47,14 +47,15 @@ exports.create = function (config, logger) {
           .keys(repo)
           .filter(x => x.startsWith(path));
         const paths = matchingFiles.slice(from, from + size);
-        const result = [];
-        for (var i = 0; i < paths.length; i++) {
-          result.push({
-            path: paths[i],
-            metadata: repo[paths[i]].metadata
-          });
-        }
-        return promise.resolve(result);
+        return promise.resolve(paths);
+        // const result = [];
+        // for (var i = 0; i < paths.length; i++) {
+        //   result.push({
+        //     path: paths[i],
+        //     metadata: repo[paths[i]].metadata
+        //   });
+        // }
+        // return promise.resolve(result);
       },
 
       delete: function (path) {

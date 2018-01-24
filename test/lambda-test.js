@@ -119,6 +119,38 @@ describe('lambda', () => {
         .done(done);
     });
 
+    it('Should return docs HTML', (done) => {
+      const event = {
+        httpMethod: 'GET',
+        path: '/$docs'
+      };
+
+      lambda
+        .handler(event, context, callback)
+        .then((response) => {
+          assert.equal(response.statusCode, 200, 'Status code should equal 200');
+          assert.equal(response.headers['Content-Type'], 'text/html', 'Content type must be correct');
+          assert(response.body.toLowerCase().indexOf('<!doctype html>') != -1, 'Body must include HTML doctype');
+        })
+        .done(done);
+    });
+
+    it('Should return docs JavaScript', (done) => {
+      const event = {
+        httpMethod: 'GET',
+        path: '/$docs/swagger-ui.js'
+      };
+
+      lambda
+        .handler(event, context, callback)
+        .then((response) => {
+          assert.equal(response.statusCode, 200, 'Status code should equal 200');
+          assert.equal(response.headers['Content-Type'], 'text/javascript', 'Content type must be correct');
+          assert(response.body.indexOf('function') != -1, 'Body must include function');
+        })
+        .done(done);
+    });
+
   });
 
 });
