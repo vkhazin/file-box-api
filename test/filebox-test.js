@@ -39,6 +39,7 @@ describe('file', function () {
         .list('/test', 0, 10)
         .then(response => {
           assert(response.length > 0, 'File list length is not correct');
+          assert(typeof response[0] == 'string', 'File list should be an array of strings');
         })
         .done(done);
     });

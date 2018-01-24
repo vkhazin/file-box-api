@@ -7,8 +7,6 @@ const config = process.env.config
   ? JSON.parse(process.env.config)
   : require('config');
 const logger = require('./logger').create(config);
-const fileboxPath = `./filebox-${config.filebox.provider}`;
-const filebox = require(fileboxPath).create(config, logger);
 const constants = require('./constants');
 
 const resolveError = (promise, callback) => {
@@ -22,35 +20,87 @@ const resolveError = (promise, callback) => {
   };
 }
 
+// Strips off the Lambda function name
 const getPath = (event, context) => {
   if (!context.functionName) {
     return event.path;
   }
   const len = `/${context.functionName}`.length;
-  return event
-    .path
-    .substring(len);
+  return event.path.substring(len);
+}
+
+// Returns the configured filebox provider, unless the mock header is present
+const getFilebox = (event) => {
+  const provider = (event.headers && event.headers[constants.MOCK_HEADER_NAME] == 'true') ? 'mock' : config.filebox.provider;
+  const fileboxPath = `./filebox-${provider}`;
+  const filebox = require(fileboxPath).create(config, logger);
+  return filebox;
 }
 
 // Handlers
+
+const docsHandler = (event, context, callback) => {
+  const fs = require('fs');
+  const utils = require('./utils');
+
+  let path = utils.removeCommandSegment(getPath(event, context)) || '/';
+  if (path == '/') {
+    path = '/index.html';
+  }
+
+  const localPath = './docs/swagger-ui' + path;
+
+  if (!fs.existsSync(localPath)) {
+    const response = { statusCode: 404 };
+    callback(null, response);
+    return resolve(response);
+  }
+
+  return new promise((resolve, reject) => {
+    fs.readFile(localPath, 'utf-8', (err, data) => {
+      if (err) {
+        return reject(err);
+      }
+
+      const contentTypes = {
+        css: 'text/css',
+        html: 'text/html',
+        js: 'text/javascript',
+        json: 'application/json',
+        png: 'image/png',
+      };
+      const ext = localPath.match(/\.(\w+)$/)[1];
+    
+      const response = {
+        statusCode: 200,
+        body: data,
+        headers: {
+          'Content-Type': contentTypes[ext] ||  'application/octet-stream'
+        }
+      };
+      callback(null, response);
+      resolve(response);    
+    });
+  });
+}
 
 const searchHandler = (event, context, callback) => {
   const qs = event.queryStringParameters || {};
   // todo: validate parameters and parse query type (e.g.
   // "q=path:/folder/to/search")
-  return filebox.list(qs.q, Number(qs.from), Number(qs.size)).then(data => {
+  return getFilebox(event).list(qs.q, Number(qs.from), Number(qs.size)).then(data => {
     const response = {
       statusCode: 200,
       body: data
     };
     callback(null, response);
     return promise.resolve(response);
-  }).catch(resolveError(promise, callback));;
+  }).catch(resolveError(promise, callback));
 }
 
-const fetchHandler = (event, context, callback) => {
+const getHandler = (event, context, callback) => {
   const path = getPath(event, context);
-  return filebox
+  return getFilebox(event)
     .fetch(path)
     .then(data => {
       const response = data
@@ -72,19 +122,11 @@ const fetchHandler = (event, context, callback) => {
     .catch(resolveError(promise, callback));
 }
 
-const getHandler = (event, context, callback) => {
-  const path = getPath(event, context);
-  const isSearch = path.match(constants.SEARCH_ROUTE_REGEX);
-  return isSearch
-    ? searchHandler(event, context, callback)
-    : fetchHandler(event, context, callback);
-}
-
 const postHandler = (event, context, callback) => {
   const path = getPath(event, context);
   const metadata = JSON.parse(event.headers[constants.METADATA_HEADER_NAME] || null);
   const contentType = event.headers['Content-Type'] || 'application/octet-stream';
-  return filebox
+  return getFilebox(event)
     .store(path, event.body, contentType, metadata)
     .then(data => {
       const response = {
@@ -99,7 +141,7 @@ const postHandler = (event, context, callback) => {
 
 const deleteHandler = (event, context, callback) => {
   const path = getPath(event, context);
-  return filebox
+  return getFilebox(event)
     .delete(path)
     .then(data => {
       const response = {
@@ -113,18 +155,30 @@ const deleteHandler = (event, context, callback) => {
 
 // Routes
 
+const createRoutePath = (relativePath) => {
+  return (config.routePrefix || '') + relativePath;
+}
+
 const routes = [
   {
     method: 'GET',
-    path: '/*',
+    path: createRoutePath('/$docs*'),
+    handler: docsHandler
+  }, {
+    method: 'GET',
+    path: createRoutePath('/$search'),
+    handler: searchHandler
+  }, {
+    method: 'GET',
+    path: new RegExp(`^${createRoutePath('\/[^$]+')}`),
     handler: getHandler
   }, {
     method: 'POST',
-    path: '/*',
+    path: createRoutePath('/*'),
     handler: postHandler
   }, {
     method: 'DELETE',
-    path: '/*',
+    path: createRoutePath('/*'),
     handler: deleteHandler
   }
 ];
