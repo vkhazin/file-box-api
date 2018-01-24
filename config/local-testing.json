@@ -2,31 +2,19 @@
   "log": {
     "level": 2
   },
+  "filebox": {
+    "provider": "mock"
+  },
+  "s3": {
+    "bucket": "file-box-poc"
+  },
   "acl": {
     "authCHeader": "x-api-key",
-    "apiKeys": [
-      {
-        "apiKey": "29ed67a1-0818-442c-9729-6a342998872c",
-        "roles": [
-          "smith-poc-file-box-api",
-          "perf8"
-        ]
-      }
-    ],
-    "roles": [
-      {
-        "role": "smith-poc-alb-api",
-        "targetGroupArns": [
-          "arn:aws:elasticloadbalancing:us-east-2:811322200214:targetgroup/smith(.+)",
-          "bad-arn"
-        ]
-      },
-      {
-        "role": "perf8",
-        "targetGroupArns": [
-          "arn:aws:elasticloadbalancing:us-east-2:811322200214:targetgroup/perf8(.+)"
-        ]
-      }      
-    ]
+    "apiKeys": [{
+      "apiKey": "",
+      "roles": [
+        "smithFileBox"
+      ]
+    }]
   }
 }

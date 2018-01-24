@@ -36,7 +36,8 @@ describe('lambda', () => {
         httpMethod: 'POST',
         path: '/test/hello-world',
         headers: {
-          [constants.METADATA_HEADER_NAME]: JSON.stringify(metadata)
+          [constants.METADATA_HEADER_NAME]: JSON.stringify(metadata),
+          'Content-Type': 'text/plain'
         },
         body: helloWorldBase64
       };
@@ -56,8 +57,9 @@ describe('lambda', () => {
     it('Should return a list of files', (done) => {
       const event = {
         httpMethod: 'GET',
-        path: '/$search/test/',
+        path: '/$search',
         queryStringParameters: {
+          q: '/test',
           from: 0,
           size: 10
         }
