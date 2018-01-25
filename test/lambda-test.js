@@ -59,7 +59,7 @@ describe('lambda', () => {
         httpMethod: 'GET',
         path: '/$search',
         queryStringParameters: {
-          q: '/test',
+          q: 'prefix:/sample',
           from: 0,
           size: 10
         }
@@ -70,7 +70,7 @@ describe('lambda', () => {
         .then((response) => {
           assert.equal(response.statusCode, 200, 'Status code should be equal 200');
           const result = JSON.parse(response.body);
-          assert(result.length > 0, 'Should return at least one file');
+          assert(result.results.length > 0, 'Should return at least one file');
         })
         .done(done);
     });

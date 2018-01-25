@@ -8,6 +8,7 @@ const config = process.env.config
   : require('config');
 const logger = require('./logger').create(config);
 const constants = require('./constants');
+const utils = require('./utils');
 
 const resolveError = (promise, callback) => {
   return (err) => {
@@ -41,19 +42,27 @@ const getFilebox = (event) => {
 
 const docsHandler = (event, context, callback) => {
   const fs = require('fs');
-  const utils = require('./utils');
+  const rawPath = getPath(event, context);
+  const relPath = utils.removeCommandSegment(rawPath);
 
-  let path = utils.removeCommandSegment(getPath(event, context)) || '/';
-  if (path == '/') {
-    path = '/index.html';
+  // Enforce base path to '/$docs' to avoid pathing problems in HTML content
+  if (relPath == '/' || relPath == '/index.html') {
+    const redirect = {
+      statusCode: 301,
+      headers: {
+        'Location': rawPath.replace(/\$docs.*/, '$docs')
+      }
+    };
+    callback(null, redirect);
+    return promise.resolve(redirect);    
   }
 
-  const localPath = './docs/swagger-ui' + path;
+  const localPath = './docs/swagger-ui' + (relPath || '/index.html');
 
   if (!fs.existsSync(localPath)) {
     const response = { statusCode: 404 };
     callback(null, response);
-    return resolve(response);
+    return promise.resolve(response);
   }
 
   return new promise((resolve, reject) => {
@@ -86,9 +95,11 @@ const docsHandler = (event, context, callback) => {
 
 const searchHandler = (event, context, callback) => {
   const qs = event.queryStringParameters || {};
-  // todo: validate parameters and parse query type (e.g.
-  // "q=path:/folder/to/search")
-  return getFilebox(event).list(qs.q, Number(qs.from), Number(qs.size)).then(data => {
+  const query = utils.parseQuery(qs.q);
+  if (!query || query.type !== 'prefix') {
+    return promise.resolve({ statusCode: 400 });
+  }
+  return getFilebox(event).search(query, Number(qs.from), Number(qs.size), qs.token).then(data => {
     const response = {
       statusCode: 200,
       body: data

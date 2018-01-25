@@ -20,7 +20,16 @@ function splitPath(path) {
   return result;
 }
 
+function parseQuery(query) {
+  const match = query.match(/^([^:]+):(.*)$/);
+  if (match && match.length == 3) {
+    return { type: match[1].toLowerCase(), data: match[2] };
+  }
+  return null;
+}
+
 module.exports = {
+  parseQuery: parseQuery,
   removeCommandSegment: removeCommandSegment,
   splitPath: splitPath
 };

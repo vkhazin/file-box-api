@@ -44,17 +44,33 @@ exports.create = function (config, logger) {
           });
       },
 
-      // todo: S3 only supports paging based on keys, not object index position
-      list: (path, from, size) => {
+      search: (query, from, size, token) => {
         const s3 = new aws.S3();
         const obj = s3Object(null, {
+          ContinuationToken: token || null,
           MaxKeys: size,
-          Prefix: stripLeadingSlash(path)
+          Prefix: stripLeadingSlash(query.data),
+          StartAfter: from || null
         });
         return s3
           .listObjectsV2(obj)
           .promise()
-          .then(data => data.Contents.map(x => '/' + x.Key));
+          .then(data => {
+            const result = {
+              moreResults: data.IsTruncated,
+              results: data.Contents.map(x => {
+                return {
+                  path: '/' + x.Key,
+                  size: x.Size,
+                  timestamp: x.LastModified.toISOString()
+                };
+              })
+            };
+            if (data.IsTruncated && data.NextContinuationToken) {
+              result.nextToken = data.NextContinuationToken;
+            }
+            return result;
+          });
       },
 
       delete: (path) => {
