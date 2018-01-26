@@ -13,6 +13,7 @@ paths:
       produces:
         - '*/*'
       parameters:
+        - $ref: '#/parameters/ApiKeyHeader'
         - $ref: '#/parameters/MockFlagHeader'
         - name: q
           in: query
@@ -54,7 +55,10 @@ paths:
       produces:
         - application/json
       parameters:
+        - $ref: '#/parameters/ApiKeyHeader'
+        - $ref: '#/parameters/ExpirationHeader'
         - $ref: '#/parameters/MockFlagHeader'
+        - $ref: '#/parameters/VersionHeader'
         - name: path
           in: path
           required: true
@@ -72,6 +76,7 @@ paths:
       produces:
         - '*/*'
       parameters:
+        - $ref: '#/parameters/ApiKeyHeader'
         - $ref: '#/parameters/MockFlagHeader'
         - name: path
           in: path
@@ -96,6 +101,7 @@ paths:
       produces:
         - application/json
       parameters:
+        - $ref: '#/parameters/ApiKeyHeader'
         - $ref: '#/parameters/MockFlagHeader'
         - name: path
           in: path
@@ -117,12 +123,30 @@ responses:
     schema:
       $ref: '#/definitions/Error'
 parameters:
+  ApiKeyHeader:
+    name: x-api-key
+    type: string
+    in: header
+    required: false
+    description: AuthN and AuthZ key
+  ExpirationHeader:
+    name: x-ttl-sec
+    type: integer
+    in: header
+    required: false
+    description: The number of seconds before the file should expire
   MockFlagHeader:
-    name: X-FileBox-Mock
+    name: x-filebox-mock
     type: boolean
     in: header
     required: false
     description: Set to true for testing against the mock service with static resources
+  VersionHeader:
+    name: x-versions-to-keep
+    type: integer
+    in: header
+    required: false
+    description: The maximum number of versions of the file that should be retained
 definitions:
   Empty:
     type: object

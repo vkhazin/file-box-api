@@ -32,7 +32,8 @@ const getPath = (event, context) => {
 
 // Returns the configured filebox provider, unless the mock header is present
 const getFilebox = (event) => {
-  const provider = (event.headers && event.headers[constants.MOCK_HEADER_NAME] == 'true') ? 'mock' : config.filebox.provider;
+  const useMock = utils.getKeyValue(event.headers, constants.MOCK_HEADER_NAME) == 'true';
+  const provider = useMock ? 'mock' : config.filebox.provider;
   const fileboxPath = `./filebox-${provider}`;
   const filebox = require(fileboxPath).create(config, logger);
   return filebox;
@@ -114,19 +115,18 @@ const getHandler = (event, context, callback) => {
   return getFilebox(event)
     .fetch(path)
     .then(data => {
-      const response = data
-        ? {
-          statusCode: 200,
-          body: data.content,
-          headers: {
-            'Content-Type': data.contentType,
-            [constants.METADATA_HEADER_NAME]: JSON.stringify(data.metadata),
-          },
-          isBase64Encoded: true
+      const response = { statusCode: 404 };
+      if (data) {
+        response.statusCode = 200;
+        response.body = data.content;
+        response.isBase64Encoded = true;
+        response.headers = { 'Content-Type': data.contentType };
+        if (data.metadata) {
+          for (var k in data.metadata) {
+            response.headers['x-metadata-' + encodeURIComponent(k)] = data.metadata[k];
+          }
         }
-        : {
-          statusCode: 404
-        };
+      }
       callback(null, response);
       return promise.resolve(response);
     })
@@ -135,15 +135,18 @@ const getHandler = (event, context, callback) => {
 
 const postHandler = (event, context, callback) => {
   const path = getPath(event, context);
-  const metadata = JSON.parse(event.headers[constants.METADATA_HEADER_NAME] || null);
   const contentType = event.headers['Content-Type'] || 'application/octet-stream';
+  const metadata = utils.parseMetadataHeaders(event.headers);
   return getFilebox(event)
     .store(path, event.body, contentType, metadata)
     .then(data => {
-      const response = {
-        statusCode: 200,
-        body: JSON.stringify(data)
-      };
+      const response = { statusCode: 200 };
+      if (data.metadata) {
+        response.headers = {};
+        for (var k in data.metadata) {
+          response.headers['x-metadata-' + encodeURIComponent(k)] = data.metadata[k];
+        }
+      }
       callback(null, response);
       return promise.resolve(response);
     })

@@ -26,7 +26,12 @@ exports.create = function (config, logger) {
           ContentType: contentType,
           Metadata: metadata
         });
-        return s3.putObject(obj).promise();
+        return s3.putObject(obj).promise().then(data => {
+          return {
+            metadata: metadata,
+            path: path
+          };
+        });
       },
 
       fetch: (path) => {

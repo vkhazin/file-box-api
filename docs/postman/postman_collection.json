@@ -1,0 +1,201 @@
+{
+	"info": {
+		"name": "SMITH FileBox",
+		"_postman_id": "5b2c58d4-6ca3-bb81-cbf6-d9eb5dca6673",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Post file",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "image/gif"
+					},
+					{
+						"key": "X-Metadata-Size",
+						"value": "Small"
+					},
+					{
+						"key": "X-Metadata-Color",
+						"value": "Red"
+					},
+					{
+						"key": "X-Metadata-Foo",
+						"value": "Bar"
+					},
+					{
+						"key": "X-FileBox-Mock",
+						"value": "true",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "file",
+					"file": {
+						"src": ""
+					}
+				},
+				"url": {
+					"raw": "https://nic9r7i7z6.execute-api.us-west-2.amazonaws.com/test/smith-file-box/sample/bus.gif",
+					"protocol": "https",
+					"host": [
+						"nic9r7i7z6",
+						"execute-api",
+						"us-west-2",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"test",
+						"smith-file-box",
+						"sample",
+						"bus.gif"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Get file",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "image/gif"
+					},
+					{
+						"key": "X-FileBox-Mock",
+						"value": "true",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "file",
+					"file": {
+						"src": ""
+					}
+				},
+				"url": {
+					"raw": "https://nic9r7i7z6.execute-api.us-west-2.amazonaws.com/test/smith-file-box/sample/bus.gif",
+					"protocol": "https",
+					"host": [
+						"nic9r7i7z6",
+						"execute-api",
+						"us-west-2",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"test",
+						"smith-file-box",
+						"sample",
+						"bus.gif"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Search",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "X-FileBox-Mock",
+						"value": "true",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "file",
+					"file": {
+						"src": ""
+					}
+				},
+				"url": {
+					"raw": "https://nic9r7i7z6.execute-api.us-west-2.amazonaws.com/test/smith-file-box/$search?q=prefix:/sample&from=0&size=10",
+					"protocol": "https",
+					"host": [
+						"nic9r7i7z6",
+						"execute-api",
+						"us-west-2",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"test",
+						"smith-file-box",
+						"$search"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "prefix:/sample",
+							"equals": true
+						},
+						{
+							"key": "from",
+							"value": "0",
+							"equals": true
+						},
+						{
+							"key": "size",
+							"value": "10",
+							"equals": true
+						}
+					]
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Delete file",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "X-FileBox-Mock",
+						"value": "true",
+						"disabled": true
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "https://nic9r7i7z6.execute-api.us-west-2.amazonaws.com/test/smith-file-box/sample/bus.gif",
+					"protocol": "https",
+					"host": [
+						"nic9r7i7z6",
+						"execute-api",
+						"us-west-2",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"test",
+						"smith-file-box",
+						"sample",
+						"bus.gif"
+					]
+				},
+				"description": null
+			},
+			"response": []
+		}
+	]
+}
