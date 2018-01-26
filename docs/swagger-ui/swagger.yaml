@@ -57,6 +57,7 @@ paths:
       parameters:
         - $ref: '#/parameters/ApiKeyHeader'
         - $ref: '#/parameters/ExpirationHeader'
+        - $ref: '#/parameters/MetadataHeader'
         - $ref: '#/parameters/MockFlagHeader'
         - $ref: '#/parameters/VersionHeader'
         - name: path
@@ -135,6 +136,12 @@ parameters:
     in: header
     required: false
     description: The number of seconds before the file should expire
+  MetadataHeader:
+    name: x-metadata-[key]
+    type: string
+    in: header
+    required: false
+    description: Use to include metadata when storing files.  Replace [key] with the metadata key name (e.g. x-metadata-color).  Add a separate header for each metadata key.
   MockFlagHeader:
     name: x-filebox-mock
     type: boolean
