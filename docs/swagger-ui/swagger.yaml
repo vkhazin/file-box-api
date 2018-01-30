@@ -14,7 +14,6 @@ paths:
         - '*/*'
       parameters:
         - $ref: '#/parameters/ApiKeyHeader'
-        - $ref: '#/parameters/MockFlagHeader'
         - name: q
           in: query
           required: true
@@ -43,6 +42,8 @@ paths:
             items:
               $ref: '#/definitions/FileList'
         '401':
+          $ref: '#/responses/NotAuthenticated'
+        '403':
           $ref: '#/responses/Unauthorized'
   '/{path}':
     post:
@@ -56,10 +57,7 @@ paths:
         - application/json
       parameters:
         - $ref: '#/parameters/ApiKeyHeader'
-        - $ref: '#/parameters/ExpirationHeader'
         - $ref: '#/parameters/MetadataHeader'
-        - $ref: '#/parameters/MockFlagHeader'
-        - $ref: '#/parameters/VersionHeader'
         - name: path
           in: path
           required: true
@@ -71,6 +69,8 @@ paths:
           schema:
             $ref: '#/definitions/FileMetaData'
         '401':
+          $ref: '#/responses/NotAuthenticated'
+        '403':
           $ref: '#/responses/Unauthorized'
     get:
       summary: Downloads a file
@@ -78,7 +78,6 @@ paths:
         - '*/*'
       parameters:
         - $ref: '#/parameters/ApiKeyHeader'
-        - $ref: '#/parameters/MockFlagHeader'
         - name: path
           in: path
           required: true
@@ -88,12 +87,14 @@ paths:
         '200':
           description: A single file
           headers:
-            X-FileBox-Metadata:
-              description: A JSON-formatted array of key/value pairs
+            'x-metadata-[key]':
               type: string
+              description: Metadata stored with the file (e.g. x-metadata-color)
           schema:
             type: file
         '401':
+          $ref: '#/responses/NotAuthenticated'
+        '403':
           $ref: '#/responses/Unauthorized'
         '404':
           $ref: '#/responses/NotFound'
@@ -103,7 +104,6 @@ paths:
         - application/json
       parameters:
         - $ref: '#/parameters/ApiKeyHeader'
-        - $ref: '#/parameters/MockFlagHeader'
         - name: path
           in: path
           required: true
@@ -113,51 +113,39 @@ paths:
         '204':
           description: No content
         '401':
+          $ref: '#/responses/NotAuthenticated'
+        '403':
           $ref: '#/responses/Unauthorized'
 responses:
   NotFound:
     description: The specified resource was not found
+  NotAuthenticated:
+    description: Not authenticated
     schema:
-      $ref: '#/definitions/Error'
+      $ref: '#/definitions/AuthError'
   Unauthorized:
-    description: Unauthorized
+    description: Not authorized for requested path
     schema:
-      $ref: '#/definitions/Error'
+      $ref: '#/definitions/AuthError'
 parameters:
   ApiKeyHeader:
     name: x-api-key
     type: string
     in: header
     required: false
-    description: AuthN and AuthZ key
-  ExpirationHeader:
-    name: x-ttl-sec
-    type: integer
-    in: header
-    required: false
-    description: The number of seconds before the file should expire
+    description: >-
+      AuthC and AuthZ key; use "e6ffd1e1-f423-4c2d-b82b-2473f673c2ba" for
+      testing against the static mock
   MetadataHeader:
-    name: x-metadata-[key]
+    name: 'x-metadata-[key]'
     type: string
     in: header
     required: false
-    description: Use to include metadata when storing files.  Replace [key] with the metadata key name (e.g. x-metadata-color).  Add a separate header for each metadata key.
-  MockFlagHeader:
-    name: x-filebox-mock
-    type: boolean
-    in: header
-    required: false
-    description: Set to true for testing against the mock service with static resources
-  VersionHeader:
-    name: x-versions-to-keep
-    type: integer
-    in: header
-    required: false
-    description: The maximum number of versions of the file that should be retained
+    description: >-
+      Use to include metadata when storing files.  Replace [key] with the
+      metadata key name (e.g. x-metadata-color).  Add a separate header for each
+      metadata key.
 definitions:
-  Empty:
-    type: object
-    title: Empty schema
   FileList:
     type: object
     title: List of files
@@ -198,13 +186,16 @@ definitions:
       timestamp:
         type: string
         description: The file's last modification date
-  Error:
+  AuthError:
     type: object
     properties:
-      code:
+      error:
         type: string
-      message:
+      path:
+        type: string
+      apiKey:
         type: string
     required:
-      - code
-      - message
+      - error
+      - path
+      - apiKey

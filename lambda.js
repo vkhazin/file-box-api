@@ -7,19 +7,30 @@ const config = process.env.config
   ? JSON.parse(process.env.config)
   : require('config');
 const logger = require('./logger').create(config);
+const auth = require('./auth').create(config, logger);
 const constants = require('./constants');
 const utils = require('./utils');
 
-const resolveError = (promise, callback) => {
-  return (err) => {
-    const response = {
-      statusCode: 500,
-      body: err
-    };
-    callback(null, response);
-    return promise.resolve(response);
+const respond = (statusCode, err, path, apiKey, callback) => {
+  const response = {
+    statusCode: statusCode,
+    body: statusCode == 500
+      ? err
+      : {
+        error: err.message.error,
+        path: path,
+        apiKey: apiKey
+      }
   };
-}
+  logger.error(response);
+  callback(null, response);
+  return promise.resolve(response);
+};
+
+const getApiKey = (event) => {
+  const apiKey = event.headers[config.acl.authCHeader];
+  return apiKey;
+};
 
 // Strips off the Lambda function name
 const getPath = (event, context) => {
@@ -27,17 +38,40 @@ const getPath = (event, context) => {
     return event.path;
   }
   const len = `/${context.functionName}`.length;
-  return event.path.substring(len);
-}
+  return event
+    .path
+    .substring(len);
+};
 
 // Returns the configured filebox provider, unless the mock header is present
-const getFilebox = (event) => {
+const getFilebox = (event, forceMock) => {
   const useMock = utils.getKeyValue(event.headers, constants.MOCK_HEADER_NAME) == 'true';
-  const provider = useMock ? 'mock' : config.filebox.provider;
+  const provider = (forceMock || useMock)
+    ? 'mock'
+    : config.filebox.provider;
   const fileboxPath = `./filebox-${provider}`;
   const filebox = require(fileboxPath).create(config, logger);
   return filebox;
-}
+};
+
+const authWrapper = (path, requestHandler, event, context, callback) => {
+  const apiKey = getApiKey(event);
+  return auth
+    .authCZ(apiKey, path)
+    .then(forceMock => {
+      const filebox = getFilebox(event, forceMock);
+      return requestHandler(filebox, event, context, callback);
+    })
+    .catch(auth.NotAuthenticated, err => {
+      return respond(401, err, path, apiKey, callback);
+    })
+    .catch(auth.NotAuthorized, err => {
+      return respond(403, err, path, apiKey, callback);
+    })
+    .catch(err => {
+      return respond(500, err, path, apiKey, callback);
+    });
+};
 
 // Handlers
 
@@ -55,13 +89,15 @@ const docsHandler = (event, context, callback) => {
       }
     };
     callback(null, redirect);
-    return promise.resolve(redirect);    
+    return promise.resolve(redirect);
   }
 
   const localPath = './docs/swagger-ui' + (relPath || '/index.html');
 
   if (!fs.existsSync(localPath)) {
-    const response = { statusCode: 404 };
+    const response = {
+      statusCode: 404
+    };
     callback(null, response);
     return promise.resolve(response);
   }
@@ -77,101 +113,114 @@ const docsHandler = (event, context, callback) => {
         html: 'text/html',
         js: 'text/javascript',
         json: 'application/json',
-        png: 'image/png',
+        png: 'image/png'
       };
       const ext = localPath.match(/\.(\w+)$/)[1];
-    
+
       const response = {
         statusCode: 200,
         body: data,
         headers: {
-          'Content-Type': contentTypes[ext] ||  'application/octet-stream'
+          'Content-Type': contentTypes[ext] || 'application/octet-stream'
         }
       };
       callback(null, response);
-      resolve(response);    
+      resolve(response);
     });
   });
-}
+};
 
 const searchHandler = (event, context, callback) => {
   const qs = event.queryStringParameters || {};
   const query = utils.parseQuery(qs.q);
   if (!query || query.type !== 'prefix') {
-    return promise.resolve({ statusCode: 400 });
+    return promise.resolve({statusCode: 400});
   }
-  return getFilebox(event).search(query, Number(qs.from), Number(qs.size), qs.token).then(data => {
-    const response = {
-      statusCode: 200,
-      body: data
-    };
-    callback(null, response);
-    return promise.resolve(response);
-  }).catch(resolveError(promise, callback));
-}
+  return authWrapper(query.data, (filebox, event, context, callback) => {
+    return filebox
+      .search(query, Number(qs.from), Number(qs.size), qs.token)
+      .then(data => {
+        const response = {
+          statusCode: 200,
+          body: data
+        };
+        callback(null, response);
+        return response;
+      });
+  }, event, context, callback);
+};
 
 const getHandler = (event, context, callback) => {
   const path = getPath(event, context);
-  return getFilebox(event)
-    .fetch(path)
-    .then(data => {
-      const response = { statusCode: 404 };
-      if (data) {
-        response.statusCode = 200;
-        response.body = data.content;
-        response.isBase64Encoded = true;
-        response.headers = { 'Content-Type': data.contentType };
-        if (data.metadata) {
-          for (var k in data.metadata) {
-            response.headers['x-metadata-' + encodeURIComponent(k)] = data.metadata[k];
+  return authWrapper(path, (filebox, event, context, callback) => {
+    return filebox
+      .fetch(path)
+      .then(data => {
+        const response = {
+          statusCode: 404
+        };
+        if (data) {
+          response.statusCode = 200;
+          response.body = data.content;
+          response.isBase64Encoded = true;
+          response.headers = {
+            'Content-Type': data.contentType
+          };
+          if (data.metadata) {
+            for (var k in data.metadata) {
+              response.headers['x-metadata-' + k] = data.metadata[k];
+            }
           }
         }
-      }
-      callback(null, response);
-      return promise.resolve(response);
-    })
-    .catch(resolveError(promise, callback));
-}
+        callback(null, response);
+        return response;
+      });
+  }, event, context, callback);
+};
 
 const postHandler = (event, context, callback) => {
   const path = getPath(event, context);
   const contentType = event.headers['Content-Type'] || 'application/octet-stream';
   const metadata = utils.parseMetadataHeaders(event.headers);
-  return getFilebox(event)
-    .store(path, event.body, contentType, metadata)
-    .then(data => {
-      const response = { statusCode: 200 };
-      if (data.metadata) {
-        response.headers = {};
-        for (var k in data.metadata) {
-          response.headers['x-metadata-' + encodeURIComponent(k)] = data.metadata[k];
+  return authWrapper(path, (filebox, event, context, callback) => {
+    return filebox
+      .store(path, event.body, contentType, metadata)
+      .then(data => {
+        const response = {
+          statusCode: 200
+        };
+        if (data.metadata) {
+          response.headers = {};
+          for (var k in data.metadata) {
+            response.headers['x-metadata-' + k] = data.metadata[k];
+          }
         }
-      }
-      callback(null, response);
-      return promise.resolve(response);
-    })
-    .catch(resolveError(promise, callback));
-}
+        callback(null, response);
+        return response;
+      });
+  }, event, context, callback);
+};
 
 const deleteHandler = (event, context, callback) => {
   const path = getPath(event, context);
-  return getFilebox(event)
-    .delete(path)
-    .then(data => {
-      const response = {
-        statusCode: 204
-      };
-      callback(null, response);
-      return promise.resolve(response);
-    })
-    .catch(resolveError(promise, callback));
-}
+  return authWrapper(path, (filebox, event, context, callback) => {
+    return filebox
+      .delete(path)
+      .then(data => {
+        const response = {
+          statusCode: 204
+        };
+        callback(null, response);
+        return response;
+      });
+  }, event, context, callback);
+};
 
 // Routes
 
 const createRoutePath = (relativePath) => {
   return (config.routePrefix || '') + relativePath;
-}
+};
 
 const routes = [
   {

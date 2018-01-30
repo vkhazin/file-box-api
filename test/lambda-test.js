@@ -1,9 +1,13 @@
-process.env.config = JSON.stringify(require('../config/local-testing.json'));
+const config = require('../config/local-testing.json');
+process.env.config = JSON.stringify(config);
+
 const assert = require('assert');
 const lambda = require('../lambda');
 const constants = require('../constants');
 const utils = require('../utils');
 
+const apiHeaderName = config.acl.authCHeader;
+const fullAccessKey = 'fca92103-e03e-4e87-b30b-999822783335';
 const helloWorldBase64 = 'SGVsbG8gV29ybGQh';
 
 const context = {
@@ -29,6 +33,7 @@ describe('lambda', () => {
         httpMethod: 'POST',
         path: '/test/hello-world',
         headers: {
+          [apiHeaderName]: fullAccessKey,
           'Accept': 'application/json',
           'Accept-Encoding': 'gzip, deflate, br',
           'Accept-Language': 'en-US,en;q=0.9',
@@ -76,6 +81,9 @@ describe('lambda', () => {
           q: 'prefix:/sample',
           from: 0,
           size: 10
+        },
+        headers: {
+          [apiHeaderName]: fullAccessKey
         }
       };
 
@@ -92,7 +100,10 @@ describe('lambda', () => {
     it('Should return file and metadata when fetched', (done) => {
       const event = {
         httpMethod: 'GET',
-        path: '/test/hello-world'
+        path: '/test/hello-world',
+        headers: {
+          [apiHeaderName]: fullAccessKey
+        }
       };
 
       lambda
@@ -109,7 +120,10 @@ describe('lambda', () => {
     it('Should return 204 when file is deleted', (done) => {
       const event = {
         httpMethod: 'DELETE',
-        path: '/test/hello-world'
+        path: '/test/hello-world',
+        headers: {
+          [apiHeaderName]: fullAccessKey
+        }
       };
 
       lambda
@@ -124,7 +138,10 @@ describe('lambda', () => {
     it('Should return 404 for missing file', (done) => {
       const event = {
         httpMethod: 'GET',
-        path: '/test/hello-world'
+        path: '/test/hello-world',
+        headers: {
+          [apiHeaderName]: fullAccessKey
+        }
       };
 
       lambda
