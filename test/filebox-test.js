@@ -31,15 +31,14 @@ describe('file', function () {
     });
   });
 
-  describe('list', function () {
+  describe('search', function () {
     it('Should return correct number of files', function (done) {
       const path = '/test/file-2';
       const metadata = [];
       filebox
-        .list('/test', 0, 10)
+        .search({ type: 'prefix', data: '/test' }, 0, 10)
         .then(response => {
-          assert(response.length > 0, 'File list length is not correct');
-          assert(typeof response[0] == 'string', 'File list should be an array of strings');
+          assert(response.results.length > 0, 'File list length is not correct');
         })
         .done(done);
     });

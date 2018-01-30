@@ -40,22 +40,25 @@ exports.create = function (config, logger) {
         return promise.resolve(repo[path] || null);
       },
 
-      list: function (path, from, size) {
+      search: function (query, from, size, token) {
         let to = from + size;
         let files = [];
         const matchingFiles = Object
           .keys(repo)
-          .filter(x => x.startsWith(path));
+          .filter(x => x.startsWith(query.data));
         const paths = matchingFiles.slice(from, from + size);
-        return promise.resolve(paths);
-        // const result = [];
-        // for (var i = 0; i < paths.length; i++) {
-        //   result.push({
-        //     path: paths[i],
-        //     metadata: repo[paths[i]].metadata
-        //   });
-        // }
-        // return promise.resolve(result);
+        const result = {
+          moreResults: false,
+          results: []
+        };
+        for (var i = 0; i < paths.length; i++) {
+          result.results.push({
+            path: paths[i],
+            size: 1234,
+            timestamp: (new Date()).toISOString()
+          });
+        }
+        return promise.resolve(result);
       },
 
       delete: function (path) {

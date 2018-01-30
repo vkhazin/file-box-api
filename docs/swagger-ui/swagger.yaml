@@ -1,0 +1,201 @@
+swagger: '2.0'
+info:
+  version: 0.1.0
+  title: FileBoxGateway
+host: nic9r7i7z6.execute-api.us-west-2.amazonaws.com
+basePath: /test/smith-file-box
+schemes:
+  - https
+paths:
+  /$search:
+    get:
+      summary: Returns a list of files based on the specified search criteria
+      produces:
+        - '*/*'
+      parameters:
+        - $ref: '#/parameters/ApiKeyHeader'
+        - name: q
+          in: query
+          required: true
+          type: string
+          description: 'The search query (e.g. "prefix:/folder/subfolder")'
+        - name: from
+          in: query
+          required: false
+          type: string
+          description: The path of the file to search after
+        - name: size
+          in: query
+          required: false
+          type: integer
+          description: The maximum number of files to return
+        - name: token
+          in: query
+          required: false
+          type: string
+          description: A continuation token from a previous paging request
+      responses:
+        '200':
+          description: List of files
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/FileList'
+        '401':
+          $ref: '#/responses/NotAuthenticated'
+        '403':
+          $ref: '#/responses/Unauthorized'
+  '/{path}':
+    post:
+      summary: Uploads a file
+      description: >-
+        File paths cannot begin with the dollar sign ($).  These paths are
+        reserved for special endpoints (e.g. /$search).
+      consumes:
+        - '*/*'
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/ApiKeyHeader'
+        - $ref: '#/parameters/MetadataHeader'
+        - name: path
+          in: path
+          required: true
+          type: string
+          description: The file path
+      responses:
+        '200':
+          description: File metadata
+          schema:
+            $ref: '#/definitions/FileMetaData'
+        '401':
+          $ref: '#/responses/NotAuthenticated'
+        '403':
+          $ref: '#/responses/Unauthorized'
+    get:
+      summary: Downloads a file
+      produces:
+        - '*/*'
+      parameters:
+        - $ref: '#/parameters/ApiKeyHeader'
+        - name: path
+          in: path
+          required: true
+          type: string
+          description: The file path
+      responses:
+        '200':
+          description: A single file
+          headers:
+            'x-metadata-[key]':
+              type: string
+              description: Metadata stored with the file (e.g. x-metadata-color)
+          schema:
+            type: file
+        '401':
+          $ref: '#/responses/NotAuthenticated'
+        '403':
+          $ref: '#/responses/Unauthorized'
+        '404':
+          $ref: '#/responses/NotFound'
+    delete:
+      summary: Deletes a file
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/ApiKeyHeader'
+        - name: path
+          in: path
+          required: true
+          type: string
+          description: The file path
+      responses:
+        '204':
+          description: No content
+        '401':
+          $ref: '#/responses/NotAuthenticated'
+        '403':
+          $ref: '#/responses/Unauthorized'
+responses:
+  NotFound:
+    description: The specified resource was not found
+  NotAuthenticated:
+    description: Not authenticated
+    schema:
+      $ref: '#/definitions/AuthError'
+  Unauthorized:
+    description: Not authorized for requested path
+    schema:
+      $ref: '#/definitions/AuthError'
+parameters:
+  ApiKeyHeader:
+    name: x-api-key
+    type: string
+    in: header
+    required: false
+    description: >-
+      AuthC and AuthZ key; use "e6ffd1e1-f423-4c2d-b82b-2473f673c2ba" for
+      testing against the static mock
+  MetadataHeader:
+    name: 'x-metadata-[key]'
+    type: string
+    in: header
+    required: false
+    description: >-
+      Use to include metadata when storing files.  Replace [key] with the
+      metadata key name (e.g. x-metadata-color).  Add a separate header for each
+      metadata key.
+definitions:
+  FileList:
+    type: object
+    title: List of files
+    properties:
+      moreResults:
+        type: boolean
+        description: 'If true, more files are available using the nextToken value'
+      nextToken:
+        type: string
+        description: 'If provided, can be used in subsequent request to continue paging'
+      results:
+        type: array
+        items:
+          $ref: '#/definitions/FileListItem'
+  FileListItem:
+    type: object
+    title: A single file in a list
+    properties:
+      path:
+        type: string
+        description: The full path to the file
+      size:
+        type: integer
+        description: The file size in bytes
+      timestamp:
+        type: string
+        description: The file's last modification date
+  FileMetaData:
+    type: object
+    title: Metadata for a single file
+    properties:
+      path:
+        type: string
+        description: The full path to the file
+      size:
+        type: integer
+        description: The file size in bytes
+      timestamp:
+        type: string
+        description: The file's last modification date
+  AuthError:
+    type: object
+    properties:
+      error:
+        type: string
+      path:
+        type: string
+      apiKey:
+        type: string
+    required:
+      - error
+      - path
+      - apiKey
