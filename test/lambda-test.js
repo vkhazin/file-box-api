@@ -64,7 +64,7 @@ describe('lambda', () => {
       lambda
         .handler(event, context, callback)
         .then((response) => {
-          assert.equal(response.statusCode, 200, 'Status code should be equal 200');
+          assert.equal(response.statusCode, 201, 'Status code should be equal 201');
           const metadata = utils.parseMetadataHeaders(response.headers);
           assert.equal(Object.keys(metadata).length, 2, 'Metadata have same number of keys');
           assert.equal(metadata.key1, event.headers['x-metadata-key1'], 'Metadata must be correct');
