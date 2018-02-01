@@ -1,3 +1,12 @@
+function addMetadataHeaders(headers, metadata) {
+  if (!metadata) return headers;
+  headers = headers || {};
+  for (var k in metadata) {
+    headers['x-metadata-' + k.toLowerCase()] = metadata[k].toString();
+  }
+  return headers;
+}
+
 function getKeyValue(obj, key) {
   if (!obj) return null;
   const keyLower = key.toLowerCase();
@@ -49,6 +58,7 @@ function splitPath(path) {
 }
 
 module.exports = {
+  addMetadataHeaders: addMetadataHeaders,
   getKeyValue: getKeyValue,
   parseMetadataHeaders: parseMetadataHeaders,
   parseQuery: parseQuery,

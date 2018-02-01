@@ -14,13 +14,11 @@ const utils = require('./utils');
 const respond = (statusCode, err, path, apiKey, callback) => {
   const response = {
     statusCode: statusCode,
-    body: statusCode == 500
-      ? err
-      : {
-        error: err.message.error,
-        path: path,
-        apiKey: apiKey
-      }
+    body: {
+      error: (err.message && err.message.error) ? err.message.error : (err || 'Unknown error'),
+      path: path,
+      apiKey: apiKey
+    }
   };
   logger.error(response);
   callback(null, response);
@@ -163,14 +161,7 @@ const getHandler = (event, context, callback) => {
           response.statusCode = 200;
           response.body = data.content;
           response.isBase64Encoded = true;
-          response.headers = {
-            'Content-Type': data.contentType
-          };
-          if (data.metadata) {
-            for (var k in data.metadata) {
-              response.headers['x-metadata-' + k] = data.metadata[k];
-            }
-          }
+          response.headers = utils.addMetadataHeaders({ 'Content-Type': data.contentType }, data.metadata);
         }
         callback(null, response);
         return response;
@@ -187,13 +178,10 @@ const postHandler = (event, context, callback) => {
       .store(path, event.body, contentType, metadata)
       .then(data => {
         const response = {
-          statusCode: 200
+          statusCode: 201
         };
         if (data.metadata) {
-          response.headers = {};
-          for (var k in data.metadata) {
-            response.headers['x-metadata-' + k] = data.metadata[k];
-          }
+          response.headers = utils.addMetadataHeaders({}, data.metadata);
         }
         callback(null, response);
         return response;

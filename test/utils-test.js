@@ -27,6 +27,41 @@ describe('utils', function () {
 
   });
 
+  describe('addMetadataHeaders', function () {
+
+    it('Should return headers', function (done) {
+      const metadata = { color: 'blue', size: 2 };
+      const headers = utils.addMetadataHeaders(null, metadata);
+      assert(Object.keys(headers).length === 2, 'Failed to add headers');
+      assert(headers['x-metadata-color'] === metadata.color, 'Failed to add header');  
+      assert(headers['x-metadata-size'] === metadata.size.toString(), 'Failed to add header');  
+      done();
+    });
+
+    it('Should not modify non-metadata headers', function (done) {
+      const metadata = { a: 1, b: 2 };
+      const headers = utils.addMetadataHeaders({ 'Content-Type': 'image/png' }, metadata);
+      assert(headers['Content-Type'] == 'image/png', 'Non-metadata header was modified');  
+      done();
+    });
+
+    it('Should create lowercase keys', function (done) {
+      const metadata = { Color: 'blue', SIZE: 2 };
+      const headers = utils.addMetadataHeaders(null, metadata);
+      assert(headers['x-metadata-color'] === metadata.Color, 'Failed to add header');
+      assert(headers['x-metadata-size'] === metadata.SIZE.toString(), 'Failed to add header');
+      done();
+    });
+
+    it('Should support dashes', function (done) {
+      const metadata = { 'max-size': 10 };
+      const headers = utils.addMetadataHeaders(null, metadata);
+      assert(headers['x-metadata-max-size'] === metadata['max-size'].toString(), 'Failed to add header');
+      done();
+    });
+
+  });
+
   describe('parseMetadataHeaders', function () {
 
     it('Should handle multiple keys', function (done) {

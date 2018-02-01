@@ -64,10 +64,8 @@ paths:
           type: string
           description: The file path
       responses:
-        '200':
-          description: File metadata
-          schema:
-            $ref: '#/definitions/FileMetaData'
+        '201':
+          description: Created
         '401':
           $ref: '#/responses/NotAuthenticated'
         '403':
@@ -163,19 +161,6 @@ definitions:
   FileListItem:
     type: object
     title: A single file in a list
-    properties:
-      path:
-        type: string
-        description: The full path to the file
-      size:
-        type: integer
-        description: The file size in bytes
-      timestamp:
-        type: string
-        description: The file's last modification date
-  FileMetaData:
-    type: object
-    title: Metadata for a single file
     properties:
       path:
         type: string

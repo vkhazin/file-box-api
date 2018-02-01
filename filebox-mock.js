@@ -62,10 +62,9 @@ exports.create = function (config, logger) {
       },
 
       delete: function (path) {
-        if (!repo[path]) {
-          return promise.reject(`No file found at "${path}"`);
+        if (repo[path]) {
+          delete repo[path];
         }
-        delete repo[path];
         return promise.resolve();
       }
 
