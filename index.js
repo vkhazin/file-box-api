@@ -10,6 +10,7 @@ const logger = require('./logger').create(config);
 const auth = require('./auth').create(config, logger);
 const constants = require('./constants');
 const utils = require('./utils');
+const router = require('aws-lambda-http-router')
 
 const respond = (statusCode, err, path, apiKey, callback) => {
   const response = {
@@ -234,6 +235,6 @@ const routes = [
   }
 ];
 
-const httpRouter = require('aws-lambda-http-router').create(routes);
+const httpRouter = router.create(routes);
 
 exports.handler = httpRouter.handler;
