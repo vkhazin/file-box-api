@@ -40,7 +40,9 @@ const getPath = (event, context) => {
   }
   if (event.path.includes(context.functionName)) {
     const len = `/${context.functionName}`.length;
-    const result = event.path.substring(len);
+    const result = event
+      .path
+      .substring(len);
     return result
   }
   return event.path
@@ -77,6 +79,26 @@ const authWrapper = (path, requestHandler, event, context, callback) => {
 };
 
 // Handlers
+
+const echoHandler = (event, context, callback) => {
+  const rawPath = getPath(event, context);
+  const relPath = utils.removeCommandSegment(rawPath);
+  const pjson = require('./package.json');
+  const response = {
+    statusCode: 200,
+    body: {
+      "version": pjson.version,
+      "node": process.version
+    },
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  };
+  return new promise((resolve, reject) => {
+    callback(null, response);
+    resolve(response);
+  });
+};
 
 const docsHandler = (event, context, callback) => {
   const fs = require('fs');
@@ -218,6 +240,10 @@ const createRoutePath = (relativePath) => {
 
 const routes = [
   {
+    method: 'GET',
+    path: createRoutePath('/$echo'),
+    handler: echoHandler
+  }, {
     method: 'GET',
     path: createRoutePath('/$docs*'),
     handler: docsHandler
