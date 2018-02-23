@@ -2,7 +2,7 @@ const config = require('../config/local-testing.json');
 process.env.config = JSON.stringify(config);
 
 const assert = require('assert');
-const lambda = require('../lambda');
+const lambda = require('../index');
 const constants = require('../constants');
 const utils = require('../utils');
 

@@ -16,7 +16,9 @@ const respond = (statusCode, err, path, apiKey, callback) => {
   const response = {
     statusCode: statusCode,
     body: {
-      error: (err.message && err.message.error) ? err.message.error : (err || 'Unknown error'),
+      error: (err.message && err.message.error)
+        ? err.message.error
+        : (err || 'Unknown error'),
       path: path,
       apiKey: apiKey
     }
@@ -36,10 +38,12 @@ const getPath = (event, context) => {
   if (!context.functionName) {
     return event.path;
   }
-  const len = `/${context.functionName}`.length;
-  return event
-    .path
-    .substring(len);
+  if (event.path.includes(context.functionName)) {
+    const len = `/${context.functionName}`.length;
+    const result = event.path.substring(len);
+    return result
+  }
+  return event.path
 };
 
 // Returns the configured filebox provider, unless the mock header is present
@@ -92,10 +96,10 @@ const docsHandler = (event, context, callback) => {
   }
 
   const localPath = './docs/swagger-ui' + (relPath || '/index.html');
-
   if (!fs.existsSync(localPath)) {
     const response = {
-      statusCode: 404
+      statusCode: 404,
+      statusMessage: 'Not Found'
     };
     callback(null, response);
     return promise.resolve(response);
@@ -136,16 +140,14 @@ const searchHandler = (event, context, callback) => {
     return promise.resolve({statusCode: 400});
   }
   return authWrapper(query.data, (filebox, event, context, callback) => {
-    return filebox
-      .search(query, Number(qs.from), Number(qs.size), qs.token)
-      .then(data => {
-        const response = {
-          statusCode: 200,
-          body: data
-        };
-        callback(null, response);
-        return response;
-      });
+    return filebox.search(query, Number(qs.from), Number(qs.size), qs.token).then(data => {
+      const response = {
+        statusCode: 200,
+        body: data
+      };
+      callback(null, response);
+      return response;
+    });
   }, event, context, callback);
 };
 
@@ -156,13 +158,16 @@ const getHandler = (event, context, callback) => {
       .fetch(path)
       .then(data => {
         const response = {
-          statusCode: 404
+          statusCode: 404,
+          statusMessage: 'Not found Path'
         };
         if (data) {
           response.statusCode = 200;
           response.body = data.content;
           response.isBase64Encoded = true;
-          response.headers = utils.addMetadataHeaders({ 'Content-Type': data.contentType }, data.metadata);
+          response.headers = utils.addMetadataHeaders({
+            'Content-Type': data.contentType
+          }, data.metadata);
         }
         callback(null, response);
         return response;
