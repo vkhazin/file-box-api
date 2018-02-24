@@ -139,5 +139,4 @@ Return Service Information
 200 OK
 Content-Type: application/json
 {"version":"1.0.0","node":"v6.10.3"}
-
 ```
