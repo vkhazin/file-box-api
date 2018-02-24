@@ -12,7 +12,7 @@ paths:
       summary: Service information
       responses:
         '200':
-          description: successful operation
+          description: Return service information
           schema:
             type: object
             items:
@@ -142,7 +142,7 @@ parameters:
     in: header
     required: false
     description: >-
-      AuthC and AuthZ key; use "e6ffd1e1-f423-4c2d-b82b-2473f673c2ba" for
+      AuthC and AuthZ key; use "e6ffd1e1-f423-4c2d-b82b-2473f673c2ba" 'for
       testing against the static mock
   MetadataHeader:
     name: 'x-metadata-[key]'
@@ -160,10 +160,10 @@ definitions:
       properties:
         node:
           type: string
-          description: Node version
+          description: 'Node version'
         version: 
           type: string
-          description: Application version
+          description: 'Application version'
   FileList:
     type: object
     title: List of files
