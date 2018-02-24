@@ -7,6 +7,16 @@ basePath: /test/smith-file-box
 schemes:
   - https
 paths:
+  /$echo:
+    get:
+      summary: Service information
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: object
+            items:
+              $ref: '#/definitions/EchoItem'
   /$search:
     get:
       summary: Returns a list of files based on the specified search criteria
@@ -144,6 +154,16 @@ parameters:
       metadata key name (e.g. x-metadata-color).  Add a separate header for each
       metadata key.
 definitions:
+  EchoItem:
+      type: object
+      title: Echo Item
+      properties:
+        node:
+          type: string
+          description: Node version
+        version: 
+          type: string
+          description: Application version
   FileList:
     type: object
     title: List of files
