@@ -2,7 +2,7 @@ const config = require('../config/local-testing.json');
 process.env.config = JSON.stringify(config);
 
 const assert = require('assert');
-const lambda = require('../lambda');
+const lambda = require('../index');
 const constants = require('../constants');
 const utils = require('../utils');
 
@@ -180,6 +180,23 @@ describe('lambda', () => {
           assert.equal(response.statusCode, 200, 'Status code should equal 200');
           assert.equal(response.headers['Content-Type'], 'text/javascript', 'Content type must be correct');
           assert(response.body.indexOf('function') != -1, 'Body must include function');
+        })
+        .done(done);
+    });
+
+    it('Should return echo', (done) => {
+      const event = {
+        httpMethod: 'GET',
+        path: '/$echo'
+      };
+
+      lambda
+        .handler(event, context, callback)
+        .then((response) => {
+          assert.equal(response.statusCode, 200, 'Status code should equal 200');
+          assert.equal(response.headers['Content-Type'], 'application/json', 'Content type must be correct');
+          assert(response.body.indexOf('node') != -1, 'Body must include app version');
+          assert(response.body.indexOf('version') != -1, 'Body must include node version');
         })
         .done(done);
     });

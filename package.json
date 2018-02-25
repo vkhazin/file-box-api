@@ -2,7 +2,7 @@
   "name": "file-box-api",
   "version": "1.0.0",
   "description": "End-point using AWS Gateway + Lambda to upload/download files",
-  "main": "lambda.js",
+  "main": "index.js",
   "scripts": {
     "test": "./node_modules/.bin/mocha --reporter spec"
   },

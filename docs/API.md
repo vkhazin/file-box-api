@@ -122,3 +122,21 @@ Content-Type: application/json
   ]
 }
 ```
+
+## Echo Request
+
+Request:
+
+```text
+GET /$echo
+```
+
+Response:
+
+Return Service Information
+
+```text
+200 OK
+Content-Type: application/json
+{"version":"1.0.0","node":"v6.10.3"}
+```
