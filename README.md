@@ -31,6 +31,8 @@
 aws configure
 ```
 
+Set Default output format: json
+
 2.Create Lambda Function
 
 ```bash
