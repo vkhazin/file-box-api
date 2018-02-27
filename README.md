@@ -25,13 +25,19 @@
 
 ## Install
 
-1.Create Lambda Function
+1.Set AWS Credentials
+
+```bash
+aws configure
+```
+
+2.Create Lambda Function
 
 ```bash
 ./aws/create-lambda.sh
 ```
 
-2.Create Api GateWay
+3.Create Api GateWay
 
 ```bash
 python3.6 ./aws/api-gateway/create-api.py
