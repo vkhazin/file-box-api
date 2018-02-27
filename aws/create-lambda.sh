@@ -1,5 +1,6 @@
 #/bin/bash
 clear
+sudo apt install -y zip 
 AWS_REGION='us-west-2'
 
 zip deployment.zip -r * -x *.git*
