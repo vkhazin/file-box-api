@@ -25,6 +25,10 @@
 
 ## Install
 
+```bash
+chmod +x ./aws/*.sh
+```
+
 1.Set AWS Credentials
 
 ```bash
@@ -33,13 +37,25 @@ aws configure
 
 Set Default output format: json
 
-2.Create Lambda Function
+2.Set Default region:
+
+```bash
+export AWS_DEFAULT_REGION=us-west-2
+```
+
+3.Create Lambda Role
+
+```bash
+./aws/create-lambda-role.sh
+```
+
+4.Create Lambda Function
 
 ```bash
 ./aws/create-lambda.sh
 ```
 
-3.Create Api GateWay
+5.Create Api GateWay
 
 ```bash
 python3.6 ./aws/api-gateway/create-api.py
