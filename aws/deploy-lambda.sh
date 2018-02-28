@@ -1,11 +1,11 @@
 #/bin/bash
-clear
-sudo apt install -y zip
+sudo yum install -y zip
 
+npm install
 zip deployment.zip -r ./ -x *.git*
 
 aws lambda update-function-code \
-    --function-name smith-poc-file-box-api \
+    --function-name $1 \
     --zip-file fileb://deployment.zip \
     --publish \
     

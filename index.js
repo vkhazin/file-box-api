@@ -1,7 +1,6 @@
 'use strict';
 
 // Dependencies
-
 const promise = require('bluebird')
 const config = process.env.config
   ? JSON.parse(process.env.config)
@@ -79,7 +78,6 @@ const authWrapper = (path, requestHandler, event, context, callback) => {
 };
 
 // Handlers
-
 const echoHandler = (event, context, callback) => {
   const rawPath = getPath(event, context);
   const relPath = utils.removeCommandSegment(rawPath);
@@ -233,9 +231,10 @@ const deleteHandler = (event, context, callback) => {
 };
 
 // Routes
-
 const createRoutePath = (relativePath) => {
-  return (config.routePrefix || '') + relativePath;
+  // const path = (config.routePrefix || '') + relativePath;
+  const path = relativePath;
+  return path;
 };
 
 const routes = [

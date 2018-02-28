@@ -1,1 +1,0 @@
-aws apigateway delete-rest-api --rest-api-id $1 --region $AWS_REGION

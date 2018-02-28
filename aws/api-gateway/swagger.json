@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "version": "2018-01-22T23:48:40Z",
-    "title": "FileBox"
+    "title": "FileBoxApi"
   },
   "host": "zpe7cdid7d.execute-api.us-west-2.amazonaws.com",
   "basePath": "/test",
@@ -30,7 +30,6 @@
               "statusCode": "200"
             }
           },
-          "uri": "arn:aws:apigateway:us-west-2:lambda:path/2015-03-31/functions/arn:aws:lambda:us-west-2:089356331440:function:smith-poc-file-box-api/invocations",
           "passthroughBehavior": "when_no_match",
           "httpMethod": "POST",
           "contentHandling": "CONVERT_TO_TEXT",

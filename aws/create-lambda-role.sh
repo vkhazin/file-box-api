@@ -1,8 +1,8 @@
 #/bin/bash
 clear
 
-lambda_execution_role_name=lambda-role-execution
-lambda_execution_access_policy_name=lambda-role-execution-access
+lambda_execution_role_name=$1
+lambda_execution_access_policy_name=$1-access
 lambda_execution_role_arn=$(aws iam create-role \
   --role-name "$lambda_execution_role_name" \
   --assume-role-policy-document '{
