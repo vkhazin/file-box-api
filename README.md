@@ -38,12 +38,12 @@
 
 2. Set AWS Credentials and Region 
   ```
-  export AWS_ACCESS_KEY_ID=YOUR-ACCESS-KEY-ID
-  export AWS_SECRET_ACCESS_KEY=YOUR-SECRET-ACCESS-KEY
-  export AWS_DEFAULT_REGION=YOUR-DEFAULT-REGION-ID
-  export LAMBDA_FUNCTION_NAME=YOUR-FUNCTION-NAME
-  export S3_BUCKET_NAME=YOUR-BUCKET-NAME
-  export LAMBDA_ROLE_NAME=YOUR-ROLE-NAME
+  export AWS_ACCESS_KEY_ID=YOUR-ACCESS-KEY-ID  
+  export AWS_SECRET_ACCESS_KEY=YOUR-SECRET-ACCESS-KEY  
+  export AWS_DEFAULT_REGION=YOUR-DEFAULT-REGION-ID  
+  export LAMBDA_FUNCTION_NAME=YOUR-FUNCTION-NAME  
+  export S3_BUCKET_NAME=YOUR-BUCKET-NAME  
+  export LAMBDA_ROLE_NAME=YOUR-ROLE-NAME  
   ```
 
 3. Create Lambda Role `./aws/create-lambda-role.sh $LAMBDA_ROLE_NAME`
@@ -52,7 +52,7 @@
 
 5. Create Api GateWay
   ```bash
-  sudo python3.6 -m pip install boto3
+  sudo python3.6 -m pip install boto3  
   python3.6 ./aws/api-gateway/create-api.py $LAMBDA_FUNCTION_NAME
   ```
 
