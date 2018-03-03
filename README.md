@@ -56,7 +56,7 @@ sudo python3.6 -m pip install boto3
 python3.6 ./aws/api-gateway/create-api.py $LAMBDA_FUNCTION_NAME
 ```
 
-6. Create Bucket: `./aws/create-bucket $S3_BUCKET_NAME`
+6. Create Bucket: `./aws/create-bucket.sh $S3_BUCKET_NAME`
   
 ## Development
 
