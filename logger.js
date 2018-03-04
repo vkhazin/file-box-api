@@ -1,9 +1,8 @@
 'use strict';
 exports.create = function (config) {
+  var logLevel = 2; //Info
   if (config.log && config.log.level) {
-    var logLevel = config.log.level;
-  } else {
-    var logLevel = 2; //Info
+    logLevel = config.log.level;
   }
 
   return (function () {

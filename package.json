@@ -4,7 +4,7 @@
   "description": "End-point using AWS Gateway + Lambda to upload/download files",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/.bin/mocha --reporter spec"
+    "test": "clear; ./node_modules/.bin/mocha --reporter spec"
   },
   "repository": {
     "type": "git",

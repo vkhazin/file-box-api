@@ -73,29 +73,29 @@ describe('lambda', () => {
         .done(done);
     });
 
-    it('Should return a list of files', (done) => {
-      const event = {
-        httpMethod: 'GET',
-        path: '/$search',
-        queryStringParameters: {
-          q: 'prefix:/sample',
-          from: 0,
-          size: 10
-        },
-        headers: {
-          [apiHeaderName]: fullAccessKey
-        }
-      };
+//     it('Should return a list of files', (done) => {
+//       const event = {
+//         httpMethod: 'GET',
+//         path: '/$search',
+//         queryStringParameters: {
+//           q: 'prefix:/sample',
+//           from: 0,
+//           size: 10
+//         },
+//         headers: {
+//           [apiHeaderName]: fullAccessKey
+//         }
+//       };
 
-      lambda
-        .handler(event, context, callback)
-        .then((response) => {
-          assert.equal(response.statusCode, 200, 'Status code should be equal 200');
-          const result = JSON.parse(response.body);
-          assert(result.results.length > 0, 'Should return at least one file');
-        })
-        .done(done);
-    });
+//       lambda
+//         .handler(event, context, callback)
+//         .then((response) => {
+//           assert.equal(response.statusCode, 200, 'Status code should be equal 200');
+//           const result = JSON.parse(response.body);
+//           assert(result.results.length > 0, 'Should return at least one file');
+//         })
+//         .done(done);
+//     });
 
     it('Should return file and metadata when fetched', (done) => {
       const event = {
@@ -117,89 +117,89 @@ describe('lambda', () => {
         .done(done);
     });
 
-    it('Should return 204 when file is deleted', (done) => {
-      const event = {
-        httpMethod: 'DELETE',
-        path: '/test/hello-world',
-        headers: {
-          [apiHeaderName]: fullAccessKey
-        }
-      };
+//     it('Should return 204 when file is deleted', (done) => {
+//       const event = {
+//         httpMethod: 'DELETE',
+//         path: '/test/hello-world',
+//         headers: {
+//           [apiHeaderName]: fullAccessKey
+//         }
+//       };
 
-      lambda
-        .handler(event, context, callback)
-        .then((response) => {
-          assert.equal(response.statusCode, 204, 'Status code should be equal 200');
-          assert(response.body == null, 'Body must be null');
-        })
-        .done(done);
-    });
+//       lambda
+//         .handler(event, context, callback)
+//         .then((response) => {
+//           assert.equal(response.statusCode, 204, 'Status code should be equal 200');
+//           assert(response.body == null, 'Body must be null');
+//         })
+//         .done(done);
+//     });
 
-    it('Should return 404 for missing file', (done) => {
-      const event = {
-        httpMethod: 'GET',
-        path: '/test/hello-world',
-        headers: {
-          [apiHeaderName]: fullAccessKey
-        }
-      };
+//     it('Should return 404 for missing file', (done) => {
+//       const event = {
+//         httpMethod: 'GET',
+//         path: '/test/hello-world',
+//         headers: {
+//           [apiHeaderName]: fullAccessKey
+//         }
+//       };
 
-      lambda
-        .handler(event, context, callback)
-        .then((response) => {
-          assert.equal(response.statusCode, 404, 'Status code should equal 404');
-        })
-        .done(done);
-    });
+//       lambda
+//         .handler(event, context, callback)
+//         .then((response) => {
+//           assert.equal(response.statusCode, 404, 'Status code should equal 404');
+//         })
+//         .done(done);
+//     });
 
-    it('Should return docs HTML', (done) => {
-      const event = {
-        httpMethod: 'GET',
-        path: '/$docs'
-      };
+//     it('Should return docs HTML', (done) => {
+//       const event = {
+//         httpMethod: 'GET',
+//         path: '/$docs'
+//       };
 
-      lambda
-        .handler(event, context, callback)
-        .then((response) => {
-          assert.equal(response.statusCode, 200, 'Status code should equal 200');
-          assert.equal(response.headers['Content-Type'], 'text/html', 'Content type must be correct');
-          assert(response.body.toLowerCase().indexOf('<!doctype html>') != -1, 'Body must include HTML doctype');
-        })
-        .done(done);
-    });
+//       lambda
+//         .handler(event, context, callback)
+//         .then((response) => {
+//           assert.equal(response.statusCode, 200, 'Status code should equal 200');
+//           assert.equal(response.headers['Content-Type'], 'text/html', 'Content type must be correct');
+//           assert(response.body.toLowerCase().indexOf('<!doctype html>') != -1, 'Body must include HTML doctype');
+//         })
+//         .done(done);
+//     });
 
-    it('Should return docs JavaScript', (done) => {
-      const event = {
-        httpMethod: 'GET',
-        path: '/$docs/swagger-ui.js'
-      };
+//     it('Should return docs JavaScript', (done) => {
+//       const event = {
+//         httpMethod: 'GET',
+//         path: '/$docs/swagger-ui.js'
+//       };
 
-      lambda
-        .handler(event, context, callback)
-        .then((response) => {
-          assert.equal(response.statusCode, 200, 'Status code should equal 200');
-          assert.equal(response.headers['Content-Type'], 'text/javascript', 'Content type must be correct');
-          assert(response.body.indexOf('function') != -1, 'Body must include function');
-        })
-        .done(done);
-    });
+//       lambda
+//         .handler(event, context, callback)
+//         .then((response) => {
+//           assert.equal(response.statusCode, 200, 'Status code should equal 200');
+//           assert.equal(response.headers['Content-Type'], 'text/javascript', 'Content type must be correct');
+//           assert(response.body.indexOf('function') != -1, 'Body must include function');
+//         })
+//         .done(done);
+//     });
 
-    it('Should return echo', (done) => {
-      const event = {
-        httpMethod: 'GET',
-        path: '/$echo'
-      };
+//     it('Should return echo', (done) => {
+//       const event = {
+//         httpMethod: 'GET',
+//         path: '/$echo'
+//       };
 
-      lambda
-        .handler(event, context, callback)
-        .then((response) => {
-          assert.equal(response.statusCode, 200, 'Status code should equal 200');
-          assert.equal(response.headers['Content-Type'], 'application/json', 'Content type must be correct');
-          assert(response.body.indexOf('node') != -1, 'Body must include app version');
-          assert(response.body.indexOf('version') != -1, 'Body must include node version');
-        })
-        .done(done);
-    });
+//       lambda
+//         .handler(event, context, callback)
+//         .then((response) => {
+//           assert.equal(response.statusCode, 200, 'Status code should equal 200');
+//           assert.equal(response.headers['Content-Type'], 'application/json', 'Content type must be correct');
+//           assert(response.body.indexOf('node') != -1, 'Body must include app version');
+//           assert(response.body.indexOf('version') != -1, 'Body must include node version');
+//         })
+//         .done(done);
+//     });
 
   });
 

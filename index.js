@@ -2,9 +2,7 @@
 
 // Dependencies
 const promise = require('bluebird')
-const config = process.env.config
-  ? JSON.parse(process.env.config)
-  : require('config');
+const config = process.env.config? JSON.parse(process.env.config): require('config');
 const logger = require('./logger').create(config);
 const auth = require('./auth').create(config, logger);
 const constants = require('./constants');
@@ -15,9 +13,7 @@ const respond = (statusCode, err, path, apiKey, callback) => {
   const response = {
     statusCode: statusCode,
     body: {
-      error: (err.message && err.message.error)
-        ? err.message.error
-        : (err || 'Unknown error'),
+      error: (err.message && err.message.error)? err.message.error: (err || 'Unknown error'),
       path: path,
       apiKey: apiKey
     }
@@ -50,9 +46,7 @@ const getPath = (event, context) => {
 // Returns the configured filebox provider, unless the mock header is present
 const getFilebox = (event, forceMock) => {
   const useMock = utils.getKeyValue(event.headers, constants.MOCK_HEADER_NAME) == 'true';
-  const provider = (forceMock || useMock)
-    ? 'mock'
-    : config.filebox.provider;
+  const provider = (forceMock || useMock)? 'mock': config.filebox.provider;
   const fileboxPath = `./filebox-${provider}`;
   const filebox = require(fileboxPath).create(config, logger);
   return filebox;
@@ -116,6 +110,7 @@ const docsHandler = (event, context, callback) => {
   }
 
   const localPath = './docs/swagger-ui' + (relPath || '/index.html');
+  
   if (!fs.existsSync(localPath)) {
     const response = {
       statusCode: 404,
@@ -171,7 +166,7 @@ const searchHandler = (event, context, callback) => {
   }, event, context, callback);
 };
 
-const getHandler = (event, context, callback) => {
+const getFileHandler = (event, context, callback) => {
   const path = getPath(event, context);
   return authWrapper(path, (filebox, event, context, callback) => {
     return filebox
@@ -179,7 +174,7 @@ const getHandler = (event, context, callback) => {
       .then(data => {
         const response = {
           statusCode: 404,
-          statusMessage: 'Not found Path'
+          statusMessage: 'Path not found'
         };
         if (data) {
           response.statusCode = 200;
@@ -188,6 +183,8 @@ const getHandler = (event, context, callback) => {
           response.headers = utils.addMetadataHeaders({
             'Content-Type': data.contentType
           }, data.metadata);
+        } else {
+          logger.error(JSON.stringify(response));
         }
         callback(null, response);
         return response;
@@ -195,7 +192,7 @@ const getHandler = (event, context, callback) => {
   }, event, context, callback);
 };
 
-const postHandler = (event, context, callback) => {
+const postFileHandler = (event, context, callback) => {
   const path = getPath(event, context);
   const contentType = event.headers['Content-Type'] || 'application/octet-stream';
   const metadata = utils.parseMetadataHeaders(event.headers);
@@ -215,7 +212,7 @@ const postHandler = (event, context, callback) => {
   }, event, context, callback);
 };
 
-const deleteHandler = (event, context, callback) => {
+const deleteFileHandler = (event, context, callback) => {
   const path = getPath(event, context);
   return authWrapper(path, (filebox, event, context, callback) => {
     return filebox
@@ -231,37 +228,31 @@ const deleteHandler = (event, context, callback) => {
 };
 
 // Routes
-const createRoutePath = (relativePath) => {
-  // const path = (config.routePrefix || '') + relativePath;
-  const path = relativePath;
-  return path;
-};
-
 const routes = [
   {
     method: 'GET',
-    path: createRoutePath('/$echo'),
+    path: '/$echo',
     handler: echoHandler
   }, {
     method: 'GET',
-    path: createRoutePath('/$docs*'),
+    path: '/$docs*',
     handler: docsHandler
   }, {
     method: 'GET',
-    path: createRoutePath('/$search'),
+    path: '/$search',
     handler: searchHandler
   }, {
     method: 'GET',
-    path: new RegExp(`^${createRoutePath('\/[^$]+')}`),
-    handler: getHandler
+    path: new RegExp('\/[^$]+'),
+    handler: getFileHandler
   }, {
     method: 'POST',
-    path: createRoutePath('/*'),
-    handler: postHandler
+    path: '/*',
+    handler: postFileHandler
   }, {
     method: 'DELETE',
-    path: createRoutePath('/*'),
-    handler: deleteHandler
+    path: '/*',
+    handler: deleteFileHandler
   }
 ];
 
