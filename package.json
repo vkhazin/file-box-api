@@ -22,7 +22,7 @@
   "homepage": "https://github.com/jaredjensen/file-box-api#readme",
   "dependencies": {
     "atob": "^2.0.3",
-    "aws-lambda-http-router": "^1.0.5",
+    "aws-lambda-http-router": "^1.0.7",
     "aws-sdk": "^2.186.0",
     "bluebird": "^3.5.0",
     "config": "^1.26.1"

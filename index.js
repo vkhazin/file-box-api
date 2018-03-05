@@ -243,7 +243,7 @@ const routes = [
     handler: searchHandler
   }, {
     method: 'GET',
-    path: new RegExp('\/[^$]+'),
+    path: '/*', //new RegExp('\/[^$]+'),
     handler: getFileHandler
   }, {
     method: 'POST',
