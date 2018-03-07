@@ -9,8 +9,9 @@
   "schemes": [
     "https"
   ],
+  "x-amazon-apigateway-binary-media-types": [ "*/*" ],
   "paths": {
-    "/{proxy+}": {
+    "/{proxy+}": {	
       "x-amazon-apigateway-any-method": {
         "produces": [
           "application/json"
@@ -23,16 +24,16 @@
             "type": "string"
           }
         ],
-        "responses": {},
+        "responses": {},       
         "x-amazon-apigateway-integration": {
           "responses": {
             "default": {
               "statusCode": "200"
             }
           },
-          "passthroughBehavior": "when_no_match",
+          "passthroughBehavior": "WHEN_NO_TEMPLATES",
           "httpMethod": "POST",
-          "contentHandling": "CONVERT_TO_TEXT",
+          "contentHandling": "CONVERT_TO_TEXT",          
           "type": "aws_proxy"
         }
       }

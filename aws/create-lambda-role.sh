@@ -44,4 +44,7 @@ aws iam attach-role-policy \
 aws iam attach-role-policy \
 --role-name $lambda_execution_role_name \
 --policy-arn 'arn:aws:iam::aws:policy/CloudWatchEventsFullAccess'
+aws iam attach-role-policy \
+--role-name $lambda_execution_role_name \
+--policy-arn 'arn:aws:iam::aws:policy/AmazonS3FullAccess'
 

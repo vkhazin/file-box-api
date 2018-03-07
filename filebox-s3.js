@@ -1,14 +1,13 @@
 'use strict';
 
-const aws = require('aws-sdk');
+const aws = require('aws-sdk')
 
 const stripLeadingSlash = (path) => {
   return path.startsWith('/') ? path.substring(1) : path;
 };
 
 exports.create = function (config, logger) {
-
-  const s3Object = (path, properties) => {
+  const s3Object = (path, properties) => {   
     const obj = Object.assign({ Bucket: config.s3.bucket }, properties);
     if (path) {
       obj.Key = stripLeadingSlash(path);
@@ -19,32 +18,35 @@ exports.create = function (config, logger) {
   return (function () {
     return {
 
-      store: (path, content, contentType, metadata) => {
-        const s3 = new aws.S3();
+      store: (path, content, contentType, metadata) => {               	
+        var buffer = new Buffer(content,'base64');		
+        const s3 = new aws.S3();       
         const obj = s3Object(path, {
-          Body: content,
-          ContentType: contentType,
-          Metadata: metadata
+          Body:buffer,       
+          Metadata: metadata,      
+          ContentType:contentType
         });
-        return s3.putObject(obj).promise().then(data => {
-          return {
+	       		
+       return s3.putObject(obj).promise().then(data => {
+         return {
             metadata: metadata,
-            path: path
-          };
-        });
+           path: path
+         };
+       });   
       },
 
-      fetch: (path) => {
+      fetch: (path) => {        
         const s3 = new aws.S3();
         const obj = s3Object(path);
         return s3
           .getObject(obj)
           .promise()
-          .then(data => {
+          .then(data => {	  
             return {
               metadata: data.Metadata,
-              content: data.Body.toString(),
-              contentType: data.ContentType
+              content: data.Body.toString('base64'),
+              contentType: data.ContentType,
+	      isBase64Encoded: true
             };
           });
       },
@@ -53,10 +55,11 @@ exports.create = function (config, logger) {
         const s3 = new aws.S3();
         const obj = s3Object(null, {
           ContinuationToken: token || null,
-          MaxKeys: size,
+          MaxKeys: size || null,
           Prefix: stripLeadingSlash(query.data),
           StartAfter: from || null
         });
+ 	
         return s3
           .listObjectsV2(obj)
           .promise()
@@ -85,7 +88,6 @@ exports.create = function (config, logger) {
           .deleteObject(obj)
           .promise();
       }
-
     };
   }());
 };
