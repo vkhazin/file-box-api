@@ -28,24 +28,9 @@ const getApiKey = (event) => {
   return apiKey;
 };
 
-// Strips off the Lambda function name
-const getPath = (event, context) => {
-  if (!context.functionName) {
-    return event.path;
-  }
-  if (event.path.includes(context.functionName)) {
-    const len = `/${context.functionName}`.length;
-    const result = event
-      .path
-      .substring(len);
-    return result
-  }
-  return event.path
-};
-
 // Returns the configured filebox provider, unless the mock header is present
-const getFilebox = (event, forceMock) => {
-  const useMock = utils.getKeyValue(event.headers, constants.MOCK_HEADER_NAME) == 'true';
+const getFilebox = (event, forceMock) => { 
+  const useMock = utils.getKeyValue(event.headers, constants.MOCK_HEADER_NAME) == 'true';  
   const provider = (forceMock || useMock)? 'mock': config.filebox.provider;
   const fileboxPath = `./filebox-${provider}`;
   const filebox = require(fileboxPath).create(config, logger);
@@ -53,11 +38,11 @@ const getFilebox = (event, forceMock) => {
 };
 
 const authWrapper = (path, requestHandler, event, context, callback) => {
-  const apiKey = getApiKey(event);
+  const apiKey = getApiKey(event); 
   return auth
     .authCZ(apiKey, path)
-    .then(forceMock => {
-      const filebox = getFilebox(event, forceMock);
+    .then(forceMock => {     
+      const filebox = getFilebox(event, forceMock);      
       return requestHandler(filebox, event, context, callback);
     })
     .catch(auth.NotAuthenticated, err => {
@@ -66,14 +51,14 @@ const authWrapper = (path, requestHandler, event, context, callback) => {
     .catch(auth.NotAuthorized, err => {
       return respond(403, err, path, apiKey, callback);
     })
-    .catch(err => {
+    .catch(err => {     
       return respond(500, err, path, apiKey, callback);
     });
 };
 
 // Handlers
 const echoHandler = (event, context, callback) => {
-  const rawPath = getPath(event, context);
+  const rawPath = event.path;  
   const relPath = utils.removeCommandSegment(rawPath);
   const pjson = require('./package.json');
   const response = {
@@ -94,7 +79,7 @@ const echoHandler = (event, context, callback) => {
 
 const docsHandler = (event, context, callback) => {
   const fs = require('fs');
-  const rawPath = getPath(event, context);
+  const rawPath = event.path;
   const relPath = utils.removeCommandSegment(rawPath);
 
   // Enforce base path to '/$docs' to avoid pathing problems in HTML content
@@ -155,7 +140,7 @@ const searchHandler = (event, context, callback) => {
     return promise.resolve({statusCode: 400});
   }
   return authWrapper(query.data, (filebox, event, context, callback) => {
-    return filebox.search(query, Number(qs.from), Number(qs.size), qs.token).then(data => {
+    return filebox.search(query, qs.from, Number(qs.size), qs.token).then(data => {
       const response = {
         statusCode: 200,
         body: data
@@ -167,23 +152,22 @@ const searchHandler = (event, context, callback) => {
 };
 
 const getFileHandler = (event, context, callback) => {
-  const path = getPath(event, context);
-  return authWrapper(path, (filebox, event, context, callback) => {
+  const path = event.path;
+  return authWrapper(path, (filebox, event, context, callback) => {   
     return filebox
       .fetch(path)
       .then(data => {
         const response = {
-          statusCode: 404,
-          statusMessage: 'Path not found'
-        };
-        if (data) {
-          response.statusCode = 200;
+          statusCode: 404,         
+        };       
+        if (data) {         
+          response.statusCode = 200;         
           response.body = data.content;
           response.isBase64Encoded = true;
           response.headers = utils.addMetadataHeaders({
             'Content-Type': data.contentType
           }, data.metadata);
-        } else {
+        } else {         
           logger.error(JSON.stringify(response));
         }
         callback(null, response);
@@ -192,14 +176,15 @@ const getFileHandler = (event, context, callback) => {
   }, event, context, callback);
 };
 
-const postFileHandler = (event, context, callback) => {
-  const path = getPath(event, context);
+const postFileHandler = (event, context, callback) => { 
+  const path = event.path;
   const contentType = event.headers['Content-Type'] || 'application/octet-stream';
   const metadata = utils.parseMetadataHeaders(event.headers);
-  return authWrapper(path, (filebox, event, context, callback) => {
-    return filebox
-      .store(path, event.body, contentType, metadata)
-      .then(data => {
+
+  return authWrapper(path, (filebox, event, context, callback) => {       
+     return filebox
+      .store(path,event.body, contentType, metadata)
+      .then(data => {        
         const response = {
           statusCode: 201
         };
@@ -213,7 +198,7 @@ const postFileHandler = (event, context, callback) => {
 };
 
 const deleteFileHandler = (event, context, callback) => {
-  const path = getPath(event, context);
+  const path = event.path;
   return authWrapper(path, (filebox, event, context, callback) => {
     return filebox
       .delete(path)
@@ -243,15 +228,15 @@ const routes = [
     handler: searchHandler
   }, {
     method: 'GET',
-    path: '/*', //new RegExp('\/[^$]+'),
+    path: '/:path([^$]+)+',
     handler: getFileHandler
   }, {
     method: 'POST',
-    path: '/*',
+    path: '/:path+',
     handler: postFileHandler
   }, {
     method: 'DELETE',
-    path: '/*',
+    path: '/:path+',
     handler: deleteFileHandler
   }
 ];
