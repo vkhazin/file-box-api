@@ -6,13 +6,13 @@ sleep 5
 
 echo "Creating Lambda: $LAMBDA_FUNCTION_NAME - Assigned Role: $LAMBDA_ROLE_NAME - Bucket: $S3_BUCKET_NAME"
 
-./aws/create-lambda.sh $LAMBDA_FUNCTION_NAME $LAMBDA_ROLE_NAME $S3_BUCKET_NAME 
+./aws/create-lambda.sh $LAMBDA_FUNCTION_NAME $LAMBDA_ROLE_NAME $S3_BUCKET_NAME
 
 sleep 10
 
 echo "Installing boto3..."
 
-sudo python3.6 -m pip install boto3 
+sudo python3.6 -m pip install boto3
 
 echo "Creating API Gateway for Lambda: $LAMBDA_FUNCTION_NAME"
 

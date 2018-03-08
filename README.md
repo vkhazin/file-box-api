@@ -71,4 +71,4 @@ python3.6 ./aws/api-gateway/create-api.py $LAMBDA_FUNCTION_NAME
 
 1. Install packages: `npm install`
 2. Update lambda: `./aws/deploy-lambda.sh $LAMBDA_FUNCTION_NAME`
-3. Deployed version: https://2ljn2ez51l.execute-api.us-east-2.amazonaws.com/test/$docs
+3. Deployed version: https://j5bfhdxiq1.execute-api.us-east-1.amazonaws.com/test/$docs

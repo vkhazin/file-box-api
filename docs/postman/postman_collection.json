@@ -1,44 +1,47 @@
 {
+	"variables": [],
 	"info": {
-		"name": "SMITH FileBox",
-		"_postman_id": "5b2c58d4-6ca3-bb81-cbf6-d9eb5dca6673",
+		"name": "SMITH FileBox Dev",
+		"_postman_id": "1e307c1d-a31f-e83a-53a1-81827d924ea5",
 		"description": "",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
 	"item": [
 		{
 			"name": "Post file",
 			"request": {
+				"url": "{{url}}/sample.png",
 				"method": "POST",
 				"header": [
 					{
 						"key": "Accept",
-						"value": "application/json"
+						"value": "application/json",
+						"description": ""
 					},
 					{
 						"key": "Content-Type",
-						"value": "image/gif"
+						"value": "image/png",
+						"description": ""
 					},
 					{
 						"key": "x-api-key",
-						"value": "e6ffd1e1-f423-4c2d-b82b-2473f673c2ba"
+						"value": "{{x-api-key}}",
+						"description": ""
 					},
 					{
 						"key": "X-Metadata-Size",
-						"value": "Small"
+						"value": "Small",
+						"description": ""
 					},
 					{
 						"key": "X-Metadata-Color",
-						"value": "Red"
+						"value": "Red",
+						"description": ""
 					},
 					{
 						"key": "X-Metadata-Foo",
-						"value": "Bar"
-					},
-					{
-						"key": "X-FileBox-Mock",
-						"value": "true",
-						"disabled": true
+						"value": "Bar",
+						"description": ""
 					}
 				],
 				"body": {
@@ -47,22 +50,27 @@
 						"src": ""
 					}
 				},
-				"url": {
-					"raw": "https://nic9r7i7z6.execute-api.us-west-2.amazonaws.com/test/smith-file-box/sample/bus2.gif",
-					"protocol": "https",
-					"host": [
-						"nic9r7i7z6",
-						"execute-api",
-						"us-west-2",
-						"amazonaws",
-						"com"
-					],
-					"path": [
-						"test",
-						"smith-file-box",
-						"sample",
-						"bus2.gif"
-					]
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "Echo",
+			"request": {
+				"url": "{{url}}/$echo",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "file",
+					"file": {
+						"src": ""
+					}
 				},
 				"description": null
 			},
@@ -71,19 +79,23 @@
 		{
 			"name": "Get file",
 			"request": {
+				"url": "{{url}}/sample.png",
 				"method": "GET",
 				"header": [
 					{
 						"key": "Accept",
-						"value": "image/gif"
+						"value": "image/gif",
+						"description": ""
 					},
 					{
 						"key": "x-api-key",
-						"value": "e6ffd1e1-f423-4c2d-b82b-2473f673c2ba"
+						"value": "{{x-api-key}}",
+						"description": ""
 					},
 					{
 						"key": "x-filebox-mock",
-						"value": "true",
+						"value": "{{mock}}",
+						"description": "",
 						"disabled": true
 					}
 				],
@@ -92,23 +104,6 @@
 					"file": {
 						"src": ""
 					}
-				},
-				"url": {
-					"raw": "https://nic9r7i7z6.execute-api.us-west-2.amazonaws.com/test/smith-file-box/sample/file2.gif",
-					"protocol": "https",
-					"host": [
-						"nic9r7i7z6",
-						"execute-api",
-						"us-west-2",
-						"amazonaws",
-						"com"
-					],
-					"path": [
-						"test",
-						"smith-file-box",
-						"sample",
-						"file2.gif"
-					]
 				},
 				"description": null
 			},
@@ -117,19 +112,52 @@
 		{
 			"name": "Search",
 			"request": {
+				"url": {
+					"raw": "{{url}}/$search?q=prefix:/sample&from=0&size=10",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"$search"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "prefix:/sample",
+							"equals": true,
+							"description": ""
+						},
+						{
+							"key": "from",
+							"value": "0",
+							"equals": true,
+							"description": ""
+						},
+						{
+							"key": "size",
+							"value": "10",
+							"equals": true,
+							"description": ""
+						}
+					],
+					"variable": []
+				},
 				"method": "GET",
 				"header": [
 					{
 						"key": "Accept",
-						"value": "application/json"
+						"value": "application/json",
+						"description": ""
 					},
 					{
 						"key": "x-api-key",
-						"value": "e6ffd1e1-f423-4c2d-b82b-2473f673c2ba"
+						"value": "{{x-api-key}}",
+						"description": ""
 					},
 					{
 						"key": "X-FileBox-Mock",
-						"value": "true",
+						"value": "{{x-api-key}}",
+						"description": "",
 						"disabled": true
 					}
 				],
@@ -139,39 +167,6 @@
 						"src": ""
 					}
 				},
-				"url": {
-					"raw": "https://nic9r7i7z6.execute-api.us-west-2.amazonaws.com/test/smith-file-box/$search?q=prefix:/sample&from=0&size=10",
-					"protocol": "https",
-					"host": [
-						"nic9r7i7z6",
-						"execute-api",
-						"us-west-2",
-						"amazonaws",
-						"com"
-					],
-					"path": [
-						"test",
-						"smith-file-box",
-						"$search"
-					],
-					"query": [
-						{
-							"key": "q",
-							"value": "prefix:/sample",
-							"equals": true
-						},
-						{
-							"key": "from",
-							"value": "0",
-							"equals": true
-						},
-						{
-							"key": "size",
-							"value": "10",
-							"equals": true
-						}
-					]
-				},
 				"description": null
 			},
 			"response": []
@@ -179,35 +174,24 @@
 		{
 			"name": "Delete file",
 			"request": {
+				"url": "{{url}}/sample.png",
 				"method": "DELETE",
 				"header": [
 					{
 						"key": "x-api-key",
-						"value": "e6ffd1e1-f423-4c2d-b82b-2473f673c2ba"
+						"value": "{{x-api-key}}",
+						"description": ""
 					},
 					{
 						"key": "X-FileBox-Mock",
-						"value": "true",
+						"value": "{{mock}}",
+						"description": "",
 						"disabled": true
 					}
 				],
-				"body": {},
-				"url": {
-					"raw": "https://nic9r7i7z6.execute-api.us-west-2.amazonaws.com/test/smith-file-box/sample/bus2.gif",
-					"protocol": "https",
-					"host": [
-						"nic9r7i7z6",
-						"execute-api",
-						"us-west-2",
-						"amazonaws",
-						"com"
-					],
-					"path": [
-						"test",
-						"smith-file-box",
-						"sample",
-						"bus2.gif"
-					]
+				"body": {
+					"mode": "raw",
+					"raw": ""
 				},
 				"description": null
 			},
